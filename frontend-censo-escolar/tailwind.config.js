@@ -6,9 +6,9 @@ export default {
   ],
   theme: {
     extend: {
-      // Aqui você pode personalizar cores para o projeto
+      // Mantendo a cor customizada para o projeto
       colors: {
-        'dataviva-blue': '#003366', // Exemplo de cor customizada
+        'dataviva-blue': '#003366',
       },
     },
   },
