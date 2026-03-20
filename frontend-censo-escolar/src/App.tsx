@@ -6,6 +6,7 @@ import './index.css';
 import MainLayout from './pages/MainLayout';
 import HomePage from './pages/HomePage';
 import Sobre from './pages/Sobre';
+import Dashboard from './pages/Dashboard';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -25,6 +26,9 @@ createRoot(document.getElementById('root')!).render(
 
             {/* Página Sobre */}
             <Route path="sobre" element={<Sobre />} />
+
+            {/* Página Dashboard */}
+            <Route path="dashboard" element={<Dashboard />} />
 
           </Route>
         </Routes>
