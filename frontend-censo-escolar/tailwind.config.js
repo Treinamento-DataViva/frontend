@@ -5,7 +5,12 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      // Mantendo a cor customizada para o projeto
+      colors: {
+        'dataviva-blue': '#003366',
+      },
+    },
   },
   plugins: [],
 }
