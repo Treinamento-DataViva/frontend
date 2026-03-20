@@ -1,4 +1,6 @@
-@tailwind utilities;
+/* index.css */
+
+@import "tailwindcss";
 
 @layer base {
   body {
