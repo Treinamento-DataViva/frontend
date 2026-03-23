@@ -21,10 +21,11 @@ const estados = [
 export default function Dashboard() {
   return (
     // Container Principal: Ocupa todo o espaço restante do MainLayout (h-full)
+
     <div className="flex h-full w-full bg-slate-50 font-sans overflow-hidden">
 
       {/* ================= SIDEBAR (Filtros) ================= */}
-      <aside className="w-[300px] shrink-0 bg-slate-900 text-slate-300 flex flex-col h-full overflow-y-auto z-20 shadow-xl">
+      <aside className="w-75 shrink-0 bg-slate-900 text-slate-300 flex flex-col h-full overflow-y-auto z-20 shadow-xl">
         <div className="p-6 space-y-8">
 
           {/* Busca */}
@@ -168,7 +169,7 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
-          
+
           {/* 3. Área do Mapa */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-1 flex flex-col">
             <div className="p-4 border-b border-slate-100 flex justify-between items-center">
@@ -180,7 +181,7 @@ export default function Dashboard() {
               </div>
             </div>
             {/* O z-0 aqui é crucial para o mapa não sobrepor modais/dropdowns do Tailwind */}
-            <div className="w-full h-[450px] rounded-b-xl overflow-hidden relative z-0">
+            <div className="w-full h-112.5 rounded-b-xl overflow-hidden relative z-0">
               <MapContainer center={[-14.235, -51.9253]} zoom={4} className="w-full h-full">
                 <TileLayer
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

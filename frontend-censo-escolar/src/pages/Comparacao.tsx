@@ -277,8 +277,9 @@ export default function ComparativaRegional() {
   ];
 
   return (
-    <div className="flex gap-6">
+    <div className="flex gap-6 h-full w-full overflow-y-auto p-6">
       {/* SIDEBAR DE FILTROS */}
+
       <aside className="w-64 bg-slate-800 text-white rounded-xl p-6 h-fit sticky top-24 shrink-0">
         <div className="space-y-6">
           {/* Configuração de Comparação */}
@@ -528,9 +529,8 @@ export default function ComparativaRegional() {
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-xs text-slate-600">{item.label}</p>
                       <span
-                        className={`text-xs font-semibold ${
-                          variance > 0 ? "text-teal-600" : "text-red-600"
-                        }`}
+                        className={`text-xs font-semibold ${variance > 0 ? "text-teal-600" : "text-red-600"
+                          }`}
                       >
                         {variance > 0 ? "+" : ""}
                         {variance.toFixed(1)}% Variance
@@ -603,21 +603,20 @@ export default function ComparativaRegional() {
                       </td>
                       <td className="px-6 py-4 text-center">
                         <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                            isPositive
-                              ? "bg-teal-50 text-teal-700"
-                              : diff === 0
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${isPositive
+                            ? "bg-teal-50 text-teal-700"
+                            : diff === 0
                               ? "bg-slate-100 text-slate-600"
                               : "bg-red-50 text-red-700"
-                          }`}
+                            }`}
                         >
                           {isPositive ? "+" : ""}
                           {diffPct}%{" "}
                           {isPositive
                             ? "ACIMA"
                             : diff === 0
-                            ? "IGUAL"
-                            : "ABAIXO"}
+                              ? "IGUAL"
+                              : "ABAIXO"}
                         </span>
                       </td>
                     </tr>

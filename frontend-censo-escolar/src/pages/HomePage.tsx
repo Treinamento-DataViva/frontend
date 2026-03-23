@@ -37,7 +37,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 2. Bloco Comparação */}
+      {/* 2. Bloco Comparação - ATUALIZADO */}
       <section className="card-dark">
         <div className="md:w-1/3 space-y-4">
           <h2 className="title-lg text-white">
@@ -47,19 +47,26 @@ export default function HomePage() {
             Compare seu município ou estado com a Média Nacional usando os índices do Censo Escolar.
           </p>
           <div className="mt-4">
-            <span className="badge-outline">Módulo em Desenvolvimento</span>
+            {/* 1. Mudamos o Link para a rota real */}
+            <Link
+              to="/comparacao"
+              className="inline-flex items-center px-6 py-2 bg-teal-500 text-white rounded-full text-sm font-bold hover:bg-teal-400 transition-all"
+            >
+              Comparar Agora
+            </Link>
           </div>
         </div>
 
-        {/* Cards de Espaço Reservado */}
+        {/* 2. Se o seu colega já criou cards reais, você pode importá-los aqui. 
+      Se não, mantemos os placeholders, mas agora com estilo de "clicável" */}
         <div className="md:w-2/3 flex gap-4 overflow-x-auto pb-4 hide-scrollbar">
           {[1, 2, 3].map((item) => (
-            <div key={item} className="placeholder-card">
-              <svg className="w-8 h-8 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4v16m8-8H4" />
+            <Link key={item} to="/comparacao" className="placeholder-card border-slate-700 hover:border-teal-500 transition-all cursor-pointer">
+              <svg className="w-8 h-8 mb-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
-              <span className="text-sm font-medium">Espaço Reservado #{item}</span>
-            </div>
+              <span className="text-sm font-medium text-slate-300">Ver Comparativo #{item}</span>
+            </Link>
           ))}
         </div>
       </section>
