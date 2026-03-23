@@ -7,6 +7,7 @@ import MainLayout from './pages/MainLayout';
 import HomePage from './pages/HomePage';
 import Sobre from './pages/Sobre';
 import Dashboard from './pages/Dashboard';
+import Comparacao from './pages/Comparacao';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -29,6 +30,8 @@ createRoot(document.getElementById('root')!).render(
 
             {/* Página Dashboard */}
             <Route path="dashboard" element={<Dashboard />} />
+
+            <Route path="comparacao" element={<Comparacao />} />
 
           </Route>
         </Routes>
