@@ -10,29 +10,16 @@ import Dashboard from './pages/Dashboard';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Suspense fallback={
-      <div className="p-8 text-center text-slate-600">
-        Carregando...
-      </div>
-    }>
+    <Suspense fallback={<div className="p-8 text-center text-slate-600">Carregando...</div>}>
       <BrowserRouter>
-
         <Routes>
-          {/* Layout envolvendo tudo */}
+          {/* MainLayout envolve TUDO para garantir o Header em todas as telas */}
           <Route path="/" element={<MainLayout />}>
-
-            {/* Página Home */}
             <Route index element={<HomePage />} />
-
-            {/* Página Sobre */}
             <Route path="sobre" element={<Sobre />} />
-
-            {/* Página Dashboard */}
             <Route path="dashboard" element={<Dashboard />} />
-
           </Route>
         </Routes>
-
       </BrowserRouter>
     </Suspense>
   </StrictMode>
