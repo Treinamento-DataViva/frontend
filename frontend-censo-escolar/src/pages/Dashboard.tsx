@@ -1,4 +1,5 @@
-import { MapContainer, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 const estados = [
@@ -18,7 +19,66 @@ const estados = [
   { sigla: "TO", nome: "Tocantins" },
 ];
 
+// Dados mockados de escolas com coordenadas
+const escolasMock = [
+  // Alta Qualidade (verde/teal)
+  { id: 1, nome: "Colégio Estadual Dom Pedro II", cidade: "São Paulo", estado: "SP", lat: -23.5505, lon: -46.6333, qualidade: "alta", tipo: "Estadual", alunos: 1200 },
+  { id: 2, nome: "Escola Municipal Santos Dumont", cidade: "Rio de Janeiro", estado: "RJ", lat: -22.9068, lon: -43.1729, qualidade: "alta", tipo: "Municipal", alunos: 850 },
+  { id: 3, nome: "Instituto Federal de Brasília", cidade: "Brasília", estado: "DF", lat: -15.7801, lon: -47.9292, qualidade: "alta", tipo: "Federal", alunos: 2100 },
+  { id: 4, nome: "Colégio Estadual Visconde de Mauá", cidade: "Curitiba", estado: "PR", lat: -25.4284, lon: -49.2733, qualidade: "alta", tipo: "Estadual", alunos: 980 },
+  { id: 5, nome: "Escola Técnica Estadual", cidade: "Belo Horizonte", estado: "MG", lat: -19.9167, lon: -43.9345, qualidade: "alta", tipo: "Estadual", alunos: 1450 },
+  
+  // Média Qualidade (cinza)
+  { id: 6, nome: "Escola Municipal Tiradentes", cidade: "Fortaleza", estado: "CE", lat: -3.7327, lon: -38.5267, qualidade: "media", tipo: "Municipal", alunos: 620 },
+  { id: 7, nome: "Colégio Estadual Central", cidade: "Salvador", estado: "BA", lat: -12.9714, lon: -38.5014, qualidade: "media", tipo: "Estadual", alunos: 740 },
+  { id: 8, nome: "Escola Estadual Anísio Teixeira", cidade: "Recife", estado: "PE", lat: -8.0476, lon: -34.8770, qualidade: "media", tipo: "Estadual", alunos: 890 },
+  { id: 9, nome: "Escola Municipal Barão do Rio Branco", cidade: "Manaus", estado: "AM", lat: -3.1190, lon: -60.0217, qualidade: "media", tipo: "Municipal", alunos: 560 },
+  { id: 10, nome: "Colégio Estadual Porto Alegre", cidade: "Porto Alegre", estado: "RS", lat: -30.0346, lon: -51.2177, qualidade: "media", tipo: "Estadual", alunos: 1050 },
+  { id: 11, nome: "Escola Municipal Presidente Vargas", cidade: "Belém", estado: "PA", lat: -1.4558, lon: -48.5044, qualidade: "media", tipo: "Municipal", alunos: 480 },
+  
+  // Baixa Qualidade (laranja)
+  { id: 12, nome: "Escola Rural São José", cidade: "Interior BA", estado: "BA", lat: -13.2564, lon: -40.3088, qualidade: "baixa", tipo: "Municipal", alunos: 180 },
+  { id: 13, nome: "Escola Municipal Esperança", cidade: "Interior MA", estado: "MA", lat: -4.9609, lon: -45.2744, qualidade: "baixa", tipo: "Municipal", alunos: 230 },
+  { id: 14, nome: "Escola Estadual Rural", cidade: "Interior PI", estado: "PI", lat: -7.1155, lon: -41.4635, qualidade: "baixa", tipo: "Estadual", alunos: 145 },
+  { id: 15, nome: "Escola Municipal Boa Vista", cidade: "Interior RO", estado: "RO", lat: -10.9387, lon: -62.8279, qualidade: "baixa", tipo: "Municipal", alunos: 195 },
+  { id: 16, nome: "Escola Rural Pequeno Príncipe", cidade: "Interior TO", estado: "TO", lat: -10.1753, lon: -48.2982, qualidade: "baixa", tipo: "Municipal", alunos: 167 },
+  { id: 17, nome: "Escola Municipal Vista Alegre", cidade: "Interior GO", estado: "GO", lat: -15.8270, lon: -48.0850, qualidade: "baixa", tipo: "Municipal", alunos: 210 },
+  
+  // Mais escolas espalhadas
+  { id: 18, nome: "Colégio Estadual Machado de Assis", cidade: "Florianópolis", estado: "SC", lat: -27.5954, lon: -48.5480, qualidade: "alta", tipo: "Estadual", alunos: 920 },
+  { id: 19, nome: "Escola Municipal João Pessoa", cidade: "João Pessoa", estado: "PB", lat: -7.1195, lon: -34.8450, qualidade: "media", tipo: "Municipal", alunos: 580 },
+  { id: 20, nome: "Colégio Estadual Amazonas", cidade: "Goiânia", estado: "GO", lat: -16.6869, lon: -49.2648, qualidade: "media", tipo: "Estadual", alunos: 1100 },
+  { id: 21, nome: "Escola Municipal Vitória", cidade: "Vitória", estado: "ES", lat: -20.3155, lon: -40.3128, qualidade: "alta", tipo: "Municipal", alunos: 670 },
+  { id: 22, nome: "Escola Estadual Senador", cidade: "Teresina", estado: "PI", lat: -5.0949, lon: -42.8042, qualidade: "media", tipo: "Estadual", alunos: 720 },
+  { id: 23, nome: "Colégio Municipal Nordeste", cidade: "Natal", estado: "RN", lat: -5.7945, lon: -35.2110, qualidade: "alta", tipo: "Municipal", alunos: 810 },
+  { id: 24, nome: "Escola Rural Sertão", cidade: "Interior AL", estado: "AL", lat: -9.6658, lon: -36.6597, qualidade: "baixa", tipo: "Municipal", alunos: 125 },
+  { id: 25, nome: "Escola Municipal Pantanal", cidade: "Campo Grande", estado: "MS", lat: -20.4697, lon: -54.6201, qualidade: "media", tipo: "Municipal", alunos: 640 },
+];
+
 export default function Dashboard() {
+  // Criar ícones customizados para cada nível de qualidade
+  const criarIcone = (qualidade: string) => {
+    const cores = {
+      alta: '#14b8a6', // teal-500
+      media: '#cbd5e1', // slate-300
+      baixa: '#fdba74', // orange-300
+    };
+
+    const svgIcon = `
+      <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="8" fill="${cores[qualidade as keyof typeof cores]}" stroke="white" stroke-width="2" opacity="0.9"/>
+        <circle cx="16" cy="16" r="12" fill="${cores[qualidade as keyof typeof cores]}" opacity="0.3"/>
+      </svg>
+    `;
+
+    return new Icon({
+      iconUrl: `data:image/svg+xml;base64,${btoa(svgIcon)}`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+      popupAnchor: [0, -16],
+    });
+  };
+
   return (
     // Container Principal: Ocupa todo o espaço restante do MainLayout (h-full)
 
@@ -187,6 +247,38 @@ export default function Dashboard() {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                 />
+                
+                {/* Marcadores das escolas */}
+                {escolasMock.map((escola) => (
+                  <Marker 
+                    key={escola.id} 
+                    position={[escola.lat, escola.lon]}
+                    icon={criarIcone(escola.qualidade)}
+                  >
+                    <Popup>
+                      <div className="p-2 min-w-[200px]">
+                        <h3 className="font-bold text-slate-900 mb-2">{escola.nome}</h3>
+                        <div className="space-y-1 text-sm text-slate-600">
+                          <p><span className="font-medium">Cidade:</span> {escola.cidade}</p>
+                          <p><span className="font-medium">Estado:</span> {escola.estado}</p>
+                          <p><span className="font-medium">Tipo:</span> {escola.tipo}</p>
+                          <p><span className="font-medium">Alunos:</span> {escola.alunos}</p>
+                          <div className="mt-2 pt-2 border-t border-slate-200">
+                            <span className={`inline-block px-2 py-1 rounded text-xs font-bold ${
+                              escola.qualidade === 'alta' ? 'bg-teal-100 text-teal-700' :
+                              escola.qualidade === 'media' ? 'bg-slate-200 text-slate-700' :
+                              'bg-orange-100 text-orange-700'
+                            }`}>
+                              {escola.qualidade === 'alta' ? 'Alta Qualidade' :
+                               escola.qualidade === 'media' ? 'Média Qualidade' :
+                               'Baixa Qualidade'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
               </MapContainer>
             </div>
           </div>
