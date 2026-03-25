@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const teamMembers = [
     { name: 'Aninha Clara', role: 'Texto', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Aninha&backgroundColor=f8fafc', socials: { github: '#', linkedin: '#', email: '#' } },
@@ -11,22 +11,22 @@ export default function Sobre() {
     const [activeTab, setActiveTab] = useState<'projeto' | 'equipe'>('projeto');
 
     return (
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8 font-sans text-slate-800">
+        <div className="about-container">
 
             {/* Breadcrumb */}
-            <nav className="text-sm font-medium text-slate-500 mb-6">
+            <nav className="about-breadcrumb">
                 Home &gt; <span className="text-slate-900 font-bold">Sobre</span>
             </nav>
 
             {/* Hero Section */}
-            <section className="bg-[#1a1e2e] text-white rounded-2xl p-8 md:p-12 mb-10 flex flex-col md:flex-row gap-8 md:gap-16 items-start">
+            <section className="about-hero">
                 <div className="md:w-1/2">
-                    <h1 className="text-4xl font-bold mb-2">Sobre</h1>
-                    <p className="text-xl text-slate-300 font-light leading-snug">
+                    <h1 className="about-hero-title">Sobre</h1>
+                    <p className="about-hero-subtitle">
                         Conheça o DataEscola, sua história e seus objetos de ação
                     </p>
                 </div>
-                <div className="md:w-1/2 text-slate-300 text-sm leading-relaxed">
+                <div className="about-hero-text">
                     <p>
                         O DataEscola é uma plataforma de visualização e análise de dados educacionais,
                         criada para tornar mais acessível a compreensão da infraestrutura escolar no
@@ -39,25 +39,22 @@ export default function Sobre() {
 
             {/* Animated Toggle Switch */}
             <div className="mb-12">
-                <div className="relative inline-flex bg-slate-200/80 rounded-full p-1 shadow-inner">
+                <div className="toggle-container">
                     {/* Fundo deslizante */}
                     <div
-                        className={`absolute top-1 bottom-1 w-27.5 bg-slate-800 rounded-full transition-transform duration-300 ease-out shadow-sm ${activeTab === 'equipe' ? 'translate-x-full' : 'translate-x-0'
-                            }`}
+                        className={`toggle-slider ${activeTab === 'equipe' ? 'translate-x-full' : 'translate-x-0'}`}
                     />
 
                     {/* Botões */}
                     <button
                         onClick={() => setActiveTab('projeto')}
-                        className={`relative z-10 w-27.5 py-1.5 text-sm font-semibold transition-colors duration-300 ${activeTab === 'projeto' ? 'text-white' : 'text-slate-600 hover:text-slate-800'
-                            }`}
+                        className={`toggle-btn ${activeTab === 'projeto' ? 'text-white' : 'text-slate-600 hover:text-slate-800'}`}
                     >
                         O Projeto
                     </button>
                     <button
                         onClick={() => setActiveTab('equipe')}
-                        className={`relative z-10 w-27.5 py-1.5 text-sm font-semibold transition-colors duration-300 ${activeTab === 'equipe' ? 'text-white' : 'text-slate-600 hover:text-slate-800'
-                            }`}
+                        className={`toggle-btn ${activeTab === 'equipe' ? 'text-white' : 'text-slate-600 hover:text-slate-800'}`}
                     >
                         Equipe
                     </button>
@@ -72,37 +69,37 @@ export default function Sobre() {
                         {/* Coluna Esquerda: Textos */}
                         <div className="lg:w-[45%] space-y-10">
                             <section>
-                                <h2 className="text-3xl font-bold text-slate-900 mb-4">O projeto</h2>
-                                <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                                <h2 className="section-title">O projeto</h2>
+                                <p className="section-paragraph mb-4">
                                     O DataEscola foi desenvolvido com a finalidade de organizar e apresentar dados sobre a infraestrutura educacional brasileira de forma mais intuitiva, visual e acessível. A proposta central é facilitar a interpretação de informações qualificadas, apoiando análises comparativas, investigações detalhadas e uma visão ampla do contexto nacional. Com isso, a plataforma busca reduzir a complexidade da leitura de bases educacionais e ampliar o acesso a informações relevantes para estudos, pesquisas e tomada de decisão.
                                 </p>
                             </section>
 
                             <section>
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">O Problema</h3>
-                                <p className="text-slate-600 text-sm leading-relaxed">
+                                <h3 className="section-subtitle">O Problema</h3>
+                                <p className="section-paragraph">
                                     O acesso a informações claras e organizadas sobre a infraestrutura escolar no Brasil ainda é um desafio. Embora existam bases públicas com grande volume de dados, muitas vezes essas informações estão dispersas, em formatos técnicos ou pouco intuitivos, o que dificulta a interpretação por estudantes, pesquisadores, gestores e pela sociedade em geral. Além disso, comparar realidades regionais, identificar desigualdades entre escolas e compreender indicadores educacionais de forma visual e acessível nem sempre é simples. A ausência de uma visualização centralizada e interativa limita a capacidade de análise e a tomada de decisão baseada em dados.
                                 </p>
                             </section>
 
                             <section>
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">A Solução</h3>
-                                <p className="text-slate-600 text-sm leading-relaxed">
+                                <h3 className="section-subtitle">A Solução</h3>
+                                <p className="section-paragraph">
                                     O <strong>DataEscola</strong> foi desenvolvido para transformar dados educacionais em informações mais acessíveis, visuais e compreensíveis. A plataforma reúne indicadores relevantes sobre a infraestrutura escolar e os apresenta em uma interface moderna, intuitiva e interativa. Por meio de gráficos, filtros e comparações, o sistema permite que o usuário explore os dados em diferentes níveis de detalhe, desde uma visão geral do cenário nacional até análises mais específicas por escola, região e critérios selecionados. O objetivo é apoiar a compreensão do panorama educacional brasileiro, facilitar análises comparativas e contribuir para uma leitura mais estratégica e transparente dos dados.
                                 </p>
                             </section>
 
                             {/* Card DataViva Integrado */}
-                            <section className="bg-slate-50 border border-slate-200 rounded-xl p-6 mt-8 relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-[#1ab09d]"></div>
-                                <h3 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
+                            <section className="dataviva-card">
+                                <div className="dataviva-card-stripe"></div>
+                                <h3 className="dataviva-card-title">
                                     <svg className="w-5 h-5 text-[#1ab09d]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                                     Tecnologia DataViva
                                 </h3>
-                                <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                                <p className="section-paragraph mb-4">
                                     O DataEscola é impulsionado pela expertise tecnológica do <strong>DataViva</strong>. Como plataforma parceira, o DataViva fornece a robustez em arquitetura de dados necessária para processar e visualizar o censo escolar de forma escalável e performática.
                                 </p>
-                                <a href="https://dataviva.info/" target="_blank" rel="noopener noreferrer" className="text-[#1ab09d] font-semibold text-sm hover:underline inline-flex items-center gap-1">
+                                <a href="https://dataviva.info/" target="_blank" rel="noopener noreferrer" className="dataviva-card-link">
                                     Conheça o DataViva <span aria-hidden="true">&rarr;</span>
                                 </a>
                             </section>
@@ -121,21 +118,21 @@ export default function Sobre() {
 
                             <div className="space-y-6">
                                 <div>
-                                    <h4 className="font-bold text-slate-900 mb-1">Visão geral da infraestrutura nacional</h4>
-                                    <p className="text-sm text-slate-600 leading-relaxed">Nesta seção, o usuário tem acesso a uma leitura ampla do cenário educacional brasileiro, com indicadores gerais sobre infraestrutura escolar em nível nacional. Essa visão permite identificar padrões, tendências e aspectos relevantes relacionados às condições das escolas no país.</p>
+                                    <h4 className="feature-title">Visão geral da infraestrutura nacional</h4>
+                                    <p className="section-paragraph">Nesta seção, o usuário tem acesso a uma leitura ampla do cenário educacional brasileiro, com indicadores gerais sobre infraestrutura escolar em nível nacional. Essa visão permite identificar padrões, tendências e aspectos relevantes relacionados às condições das escolas no país.</p>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-slate-900 mb-1">Análises comparativas regionais</h4>
-                                    <p className="text-sm text-slate-600 leading-relaxed">A plataforma também oferece recursos para comparar diferentes contextos regionais. Por meio de filtros e seleções, o usuário pode analisar escolas, localidades ou grupos específicos, observando diferenças e semelhanças entre os dados apresentados.</p>
+                                    <h4 className="feature-title">Análises comparativas regionais</h4>
+                                    <p className="section-paragraph">A plataforma também oferece recursos para comparar diferentes contextos regionais. Por meio de filtros e seleções, o usuário pode analisar escolas, localidades ou grupos específicos, observando diferenças e semelhanças entre os dados apresentados.</p>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-slate-900 mb-1">Análises detalhadas</h4>
-                                    <p className="text-sm text-slate-600 leading-relaxed">Para uma exploração mais aprofundada, o sistema disponibiliza análises detalhadas que permitem examinar informações específicas de forma mais precisa. Essa funcionalidade é útil para usuários que desejam investigar recortes particulares e compreender melhor determinados indicadores.</p>
+                                    <h4 className="feature-title">Análises detalhadas</h4>
+                                    <p className="section-paragraph">Para uma exploração mais aprofundada, o sistema disponibiliza análises detalhadas que permitem examinar informações específicas de forma mais precisa. Essa funcionalidade é útil para usuários que desejam investigar recortes particulares e compreender melhor determinados indicadores.</p>
                                 </div>
                             </div>
 
                             <div>
-                                <h4 className="font-bold text-slate-900 mb-2">Público-alvo</h4>
+                                <h4 className="feature-title mb-2">Público-alvo</h4>
                                 <p className="text-sm text-slate-600 mb-2">O projeto pode ser útil para:</p>
                                 <ul className="list-disc pl-5 text-sm text-slate-600 space-y-1">
                                     <li>estudantes e pesquisadores</li>
@@ -153,12 +150,12 @@ export default function Sobre() {
             {/* Content: Equipe */}
             {activeTab === 'equipe' && (
                 <div className="animate-in fade-in duration-500">
-                    <h2 className="text-3xl font-bold text-slate-900 mb-12">Equipe</h2>
+                    <h2 className="section-title mb-12">Equipe</h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
                         {teamMembers.map((member, i) => (
                             <div key={i} className="flex flex-col items-center text-center">
                                 {/* Avatar */}
-                                <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-100 mb-4 border border-slate-200">
+                                <div className="team-avatar-container">
                                     <img src={member.avatar} alt={`Avatar de ${member.name}`} className="w-full h-full object-cover" />
                                 </div>
 

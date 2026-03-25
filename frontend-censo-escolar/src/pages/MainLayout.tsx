@@ -20,25 +20,25 @@ export default function MainLayout() {
     <div className={`flex flex-col bg-slate-50 ${isFullScreenPage ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
 
       {/* HEADER: Inspirado no DataViva com Animação */}
-      <header className="bg-white border-b border-slate-200 shrink-0 z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+      <header className="header-container">
+        <div className="header-content">
 
           {/* Logo DataEscola */}
-          <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
-            <span className="text-3xl font-black text-[#222a2e] tracking-tight">Data</span>
-            <span className="text-3xl font-bold italic text-[#1ab09d] tracking-tight">Escola</span>
+          <Link to="/" className="logo-link">
+            <span className="logo-text-dark">Data</span>
+            <span className="logo-text-teal">Escola</span>
           </Link>
 
           {/* Área de Navegação e Ações */}
           <div className="flex items-center gap-4">
 
             {/* Pílula de Navegação com Slide */}
-            <nav className="hidden md:flex relative items-center bg-slate-100 rounded-full p-1 border border-slate-200/60 shadow-inner">
+            <nav className="nav-pill-container">
 
               {/* Fundo animado (só aparece se alguma aba do menu estiver ativa) */}
               {activeIndex >= 0 && (
                 <div
-                  className="absolute top-1 bottom-1 w-29 bg-[#222a2e] rounded-full transition-transform duration-300 ease-out shadow-sm z-0"
+                  className="nav-pill-slider"
                   style={{ transform: `translateX(${activeIndex * 100}%)` }}
                 />
               )}
@@ -50,8 +50,7 @@ export default function MainLayout() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`relative z-10 w-29 text-center py-1.5 text-sm font-semibold transition-colors duration-300 ${isActive ? 'text-white' : 'text-slate-600 hover:text-slate-900'
-                      }`}
+                    className={`nav-item-btn ${isActive ? 'text-white' : 'text-slate-600 hover:text-slate-900'}`}
                   >
                     {item.label}
                   </Link>
@@ -64,9 +63,9 @@ export default function MainLayout() {
               href="https://dataviva.info"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm bg-white"
+              className="btn-external"
             >
-              <div className="w-5 h-5 rounded-full bg-[#222a2e] flex items-center justify-center text-[10px] font-bold text-white">
+              <div className="btn-external-icon">
                 DV
               </div>
               Conhecer o DataViva
@@ -83,20 +82,20 @@ export default function MainLayout() {
 
       {/* FOOTER GLOBAL: Estilo Dark Minimalista */}
       {!isFullScreenPage && (
-        <footer className="bg-[#222a2e] text-slate-300 mt-auto border-t-4 border-[#1ab09d]">
-          <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col items-center gap-6">
+        <footer className="footer-container">
+          <div className="footer-content">
 
-            <Link to="/" className="flex items-center opacity-90 hover:opacity-100 transition-opacity">
-              <span className="text-2xl font-black text-white tracking-tight">Data</span>
-              <span className="text-2xl font-bold italic text-[#1ab09d] tracking-tight">Escola</span>
+            <Link to="/" className="logo-link hover:opacity-100 opacity-90">
+              <span className="logo-text-dark text-white">Data</span>
+              <span className="logo-text-teal">Escola</span>
             </Link>
 
-            <div className="flex gap-8 text-sm font-medium">
+            <div className="footer-nav-links">
               <span className="hover:text-white cursor-pointer transition-colors">Privacidade</span>
               <span className="hover:text-white cursor-pointer transition-colors">Contato</span>
             </div>
 
-            <div className="flex gap-4 pt-4">
+            <div className="footer-social-links">
               <a href="#" className="hover:text-white transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" /></svg>
               </a>
