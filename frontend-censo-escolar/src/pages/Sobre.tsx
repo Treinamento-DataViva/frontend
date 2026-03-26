@@ -1,76 +1,184 @@
-import React from 'react';
+import { useState } from 'react';
+
+const teamMembers = [
+    { name: 'Aninha Clara', role: 'Texto', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Aninha&backgroundColor=f8fafc', socials: { github: '#', linkedin: '#', email: '#' } },
+    { name: 'João', role: 'Texto', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Joao&backgroundColor=f8fafc', socials: { github: '#', linkedin: '#', email: '#' } },
+    { name: 'Paulo', role: 'Texto', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Paulo&backgroundColor=f8fafc', socials: { github: '#', linkedin: '#', email: '#' } },
+    { name: 'Pedro', role: 'Texto', avatar: 'https://api.dicebear.com/7.x/notionists/svg?seed=Pedro&backgroundColor=f8fafc', socials: { github: '#', linkedin: '#', email: '#' } },
+];
 
 export default function Sobre() {
+    const [activeTab, setActiveTab] = useState<'projeto' | 'equipe'>('projeto');
+
     return (
-        <main className="min-h-screen bg-slate-50 py-12 px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
+        <div className="about-container">
 
-                {/* Cabeçalho da Página */}
-                <header className="text-center mb-16">
-                    <h1 className="text-4xl font-extrabold text-slate-900 sm:text-5xl mb-4">
-                        Sobre o Projeto
-                    </h1>
-                    <div className="h-1.5 w-20 bg-blue-600 mx-auto rounded-full"></div>
-                </header>
+            {/* Breadcrumb */}
+            <nav className="about-breadcrumb">
+                Home &gt; <span className="text-slate-900 font-bold">Sobre</span>
+            </nav>
 
-                <div className="space-y-12">
+            {/* Hero Section */}
+            <section className="about-hero">
+                <div className="md:w-1/2">
+                    <h1 className="about-hero-title">Sobre</h1>
+                    <p className="about-hero-subtitle">
+                        Conheça o DataEscola, sua história e seus objetos de ação
+                    </p>
+                </div>
+                <div className="about-hero-text">
+                    <p>
+                        O DataEscola é uma plataforma de visualização e análise de dados educacionais,
+                        criada para tornar mais acessível a compreensão da infraestrutura escolar no
+                        Brasil. Por meio de uma interface interativa, o sistema permite explorar o cenário
+                        nacional, comparar realidades regionais e aprofundar análises específicas com
+                        apoio de filtros e seleções.
+                    </p>
+                </div>
+            </section>
 
-                    {/* Seção 1: O Projeto Censo Escolar */}
-                    <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 md:p-10 hover:shadow-md transition-shadow">
-                        <div className="flex items-center gap-3 mb-6">
-                            <span className="p-2 bg-blue-100 text-blue-600 rounded-lg">
-                                {/* Ícone simples em SVG */}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" /><path d="M8 7h6" /><path d="M8 11h8" /></svg>
-                            </span>
-                            <h2 className="text-2xl font-bold text-slate-800">Censo Escolar</h2>
-                        </div>
+            {/* Animated Toggle Switch */}
+            <div className="mb-12">
+                <div className="toggle-container">
+                    {/* Fundo deslizante */}
+                    <div
+                        className={`toggle-slider ${activeTab === 'equipe' ? 'translate-x-full' : 'translate-x-0'}`}
+                    />
 
-                        <div className="space-y-4 text-slate-600 leading-relaxed">
-                            <p>
-                                O projeto <strong>Censo Escolar</strong> nasceu da necessidade de transformar dados brutos em inteligência estratégica. Nosso foco é facilitar a visualização de indicadores educacionais complexos, permitindo que gestores e pesquisadores tomem decisões baseadas em evidências.
-                            </p>
-                            <p>
-                                Utilizamos tecnologias de ponta para garantir que a navegação seja rápida e que os gráficos sejam intuitivos, focando sempre na acessibilidade e na clareza das informações apresentadas.
-                            </p>
-                        </div>
-                    </section>
-
-                    {/* Seção 2: O Projeto Mãe (DataViva) */}
-                    <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 md:p-10 hover:shadow-md transition-shadow relative overflow-hidden">
-                        {/* Detalhe visual na borda para diferenciar o "Projeto Mãe" */}
-                        <div className="absolute top-0 left-0 w-2 h-full bg-indigo-500"></div>
-
-                        <div className="flex items-center gap-3 mb-6">
-                            <span className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" /><path d="M16 16h5v5" /></svg>
-                            </span>
-                            <h2 className="text-2xl font-bold text-slate-800">O Ecossistema DataViva</h2>
-                        </div>
-
-                        <div className="space-y-4 text-slate-600 leading-relaxed">
-                            <p>
-                                O Censo Escolar é uma iniciativa que se apoia na robustez do <strong>DataViva</strong>. Como projeto mãe, o DataViva fornece a base metodológica e tecnológica para a exploração de dados socioeconômicos em larga escala no Brasil.
-                            </p>
-                            <p>
-                                A integração entre as plataformas permite uma análise contextualizada, onde a educação não é vista isoladamente, mas como parte fundamental do desenvolvimento econômico e social de cada região.
-                            </p>
-                        </div>
-
-                        <div className="mt-8 pt-6 border-t border-slate-100">
-                            <a
-                                href="https://dataviva.info/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center text-indigo-600 font-semibold hover:text-indigo-700 transition-colors"
-                            >
-                                Conheça o DataViva
-                                <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </a>
-                        </div>
-                    </section>
-
+                    {/* Botões */}
+                    <button
+                        onClick={() => setActiveTab('projeto')}
+                        className={`toggle-btn ${activeTab === 'projeto' ? 'text-white' : 'text-slate-600 hover:text-slate-800'}`}
+                    >
+                        O Projeto
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('equipe')}
+                        className={`toggle-btn ${activeTab === 'equipe' ? 'text-white' : 'text-slate-600 hover:text-slate-800'}`}
+                    >
+                        Equipe
+                    </button>
                 </div>
             </div>
-        </main>
+
+            {/* Content: O Projeto */}
+            {activeTab === 'projeto' && (
+                <div className="animate-in fade-in duration-500">
+                    <div className="flex flex-col lg:flex-row gap-16">
+
+                        {/* Coluna Esquerda: Textos */}
+                        <div className="lg:w-[45%] space-y-10">
+                            <section>
+                                <h2 className="section-title">O projeto</h2>
+                                <p className="section-paragraph mb-4">
+                                    O DataEscola foi desenvolvido com a finalidade de organizar e apresentar dados sobre a infraestrutura educacional brasileira de forma mais intuitiva, visual e acessível. A proposta central é facilitar a interpretação de informações qualificadas, apoiando análises comparativas, investigações detalhadas e uma visão ampla do contexto nacional. Com isso, a plataforma busca reduzir a complexidade da leitura de bases educacionais e ampliar o acesso a informações relevantes para estudos, pesquisas e tomada de decisão.
+                                </p>
+                            </section>
+
+                            <section>
+                                <h3 className="section-subtitle">O Problema</h3>
+                                <p className="section-paragraph">
+                                    O acesso a informações claras e organizadas sobre a infraestrutura escolar no Brasil ainda é um desafio. Embora existam bases públicas com grande volume de dados, muitas vezes essas informações estão dispersas, em formatos técnicos ou pouco intuitivos, o que dificulta a interpretação por estudantes, pesquisadores, gestores e pela sociedade em geral. Além disso, comparar realidades regionais, identificar desigualdades entre escolas e compreender indicadores educacionais de forma visual e acessível nem sempre é simples. A ausência de uma visualização centralizada e interativa limita a capacidade de análise e a tomada de decisão baseada em dados.
+                                </p>
+                            </section>
+
+                            <section>
+                                <h3 className="section-subtitle">A Solução</h3>
+                                <p className="section-paragraph">
+                                    O <strong>DataEscola</strong> foi desenvolvido para transformar dados educacionais em informações mais acessíveis, visuais e compreensíveis. A plataforma reúne indicadores relevantes sobre a infraestrutura escolar e os apresenta em uma interface moderna, intuitiva e interativa. Por meio de gráficos, filtros e comparações, o sistema permite que o usuário explore os dados em diferentes níveis de detalhe, desde uma visão geral do cenário nacional até análises mais específicas por escola, região e critérios selecionados. O objetivo é apoiar a compreensão do panorama educacional brasileiro, facilitar análises comparativas e contribuir para uma leitura mais estratégica e transparente dos dados.
+                                </p>
+                            </section>
+
+                            {/* Card DataViva Integrado */}
+                            <section className="dataviva-card">
+                                <div className="dataviva-card-stripe"></div>
+                                <h3 className="dataviva-card-title">
+                                    <svg className="w-5 h-5 text-[#1ab09d]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    Tecnologia DataViva
+                                </h3>
+                                <p className="section-paragraph mb-4">
+                                    O DataEscola é impulsionado pela expertise tecnológica do <strong>DataViva</strong>. Como plataforma parceira, o DataViva fornece a robustez em arquitetura de dados necessária para processar e visualizar o censo escolar de forma escalável e performática.
+                                </p>
+                                <a href="https://dataviva.info/" target="_blank" rel="noopener noreferrer" className="dataviva-card-link">
+                                    Conheça o DataViva <span aria-hidden="true">&rarr;</span>
+                                </a>
+                            </section>
+                        </div>
+
+                        {/* Coluna Direita: Imagens e Tópicos */}
+                        <div className="lg:w-[55%] space-y-10">
+
+                            {/* Mockup Placeholder - Censo Escolar */}
+                            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                                {/* Substitua esta div pela tag <img /> do mockup real */}
+                                <div className="w-full aspect-4/3 bg-slate-100 flex items-center justify-center text-slate-400 font-mono text-sm border-b border-slate-200">
+                                    [ IMAGEM DO DASHBOARD / MOCKUP ]
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div>
+                                    <h4 className="feature-title">Visão geral da infraestrutura nacional</h4>
+                                    <p className="section-paragraph">Nesta seção, o usuário tem acesso a uma leitura ampla do cenário educacional brasileiro, com indicadores gerais sobre infraestrutura escolar em nível nacional. Essa visão permite identificar padrões, tendências e aspectos relevantes relacionados às condições das escolas no país.</p>
+                                </div>
+                                <div>
+                                    <h4 className="feature-title">Análises comparativas regionais</h4>
+                                    <p className="section-paragraph">A plataforma também oferece recursos para comparar diferentes contextos regionais. Por meio de filtros e seleções, o usuário pode analisar escolas, localidades ou grupos específicos, observando diferenças e semelhanças entre os dados apresentados.</p>
+                                </div>
+                                <div>
+                                    <h4 className="feature-title">Análises detalhadas</h4>
+                                    <p className="section-paragraph">Para uma exploração mais aprofundada, o sistema disponibiliza análises detalhadas que permitem examinar informações específicas de forma mais precisa. Essa funcionalidade é útil para usuários que desejam investigar recortes particulares e compreender melhor determinados indicadores.</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 className="feature-title mb-2">Público-alvo</h4>
+                                <p className="text-sm text-slate-600 mb-2">O projeto pode ser útil para:</p>
+                                <ul className="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                    <li>estudantes e pesquisadores</li>
+                                    <li>gestores educacionais</li>
+                                    <li>profissionais da área de dados e educação</li>
+                                    <li>cidadãos interessados em compreender o cenário da infraestrutura escolar no Brasil</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            )}
+
+            {/* Content: Equipe */}
+            {activeTab === 'equipe' && (
+                <div className="animate-in fade-in duration-500">
+                    <h2 className="section-title mb-12">Equipe</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
+                        {teamMembers.map((member, i) => (
+                            <div key={i} className="flex flex-col items-center text-center">
+                                {/* Avatar */}
+                                <div className="team-avatar-container">
+                                    <img src={member.avatar} alt={`Avatar de ${member.name}`} className="w-full h-full object-cover" />
+                                </div>
+
+                                <h3 className="font-bold text-slate-900">{member.name}</h3>
+                                <p className="text-xs text-slate-500 mb-4 mt-1">{member.role}</p>
+
+                                {/* Social Icons */}
+                                <div className="flex items-center gap-3 text-slate-400">
+                                    <a href={member.socials.github} className="hover:text-slate-900 transition-colors">
+                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" /></svg>
+                                    </a>
+                                    <a href={member.socials.linkedin} className="hover:text-[#0a66c2] transition-colors">
+                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clipRule="evenodd" /></svg>
+                                    </a>
+                                    <a href={member.socials.email} className="hover:text-red-500 transition-colors">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                    </a>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
