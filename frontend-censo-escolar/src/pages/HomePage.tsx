@@ -6,6 +6,7 @@ export default function HomePage() {
 
       {/* 1. Bloco Hero */}
       <section className="card-hero">
+        {/* Padronizado com space-y-6 */}
         <div className="md:w-1/2 space-y-6">
           <span className="badge-teal">Visualização Principal</span>
 
@@ -13,11 +14,13 @@ export default function HomePage() {
             Diagnóstico do <br /> Cenário Escolar
           </h1>
 
-          <p className="text-hero-desc">
+          {/* Adicionado text-justify */}
+          <p className="text-hero-desc text-justify">
             Explore nosso painel interativo. Saiba qual a composição da infraestrutura escolar, métricas de saneamento e a conectividade em todo o país através de dados oficiais do Censo Escolar.
           </p>
 
-          <div className="pt-4">
+          {/* Removido o pt-4 para deixar o space-y-6 ditar a distância de forma uniforme */}
+          <div>
             <Link to="/dashboard" className="btn-primary">
               Acessar Dashboard
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,23 +42,25 @@ export default function HomePage() {
 
       {/* 2. Bloco Comparação - ATUALIZADO */}
       <section className="card-dark">
-        <div className="md:w-1/3 space-y-4">
+        {/* Atualizado de space-y-4 para space-y-6 para manter o padrão */}
+        <div className="md:w-1/3 space-y-6">
           <h2 className="title-lg text-white">
             Análises<br />Comparativas
           </h2>
-          <p className="text-dark-desc">
+
+          {/* Adicionado text-justify */}
+          <p className="text-dark-desc text-justify">
             Compare seu município ou estado com a Média Nacional usando os índices do Censo Escolar.
           </p>
-          <div className="mt-4">
-            {/* 1. Mudamos o Link para a rota real */}
+
+          {/* Removido mt-4 para usar o espaçamento do container */}
+          <div>
             <Link to="/comparacao" className="btn-teal">
               Comparar Agora
             </Link>
           </div>
         </div>
 
-        {/* 2. Se o seu colega já criou cards reais, você pode importá-los aqui. 
-      Se não, mantemos os placeholders, mas agora com estilo de "clicável" */}
         <div className="md:w-2/3 flex gap-4 overflow-x-auto pb-4 hide-scrollbar">
           {[1, 2, 3].map((item) => (
             <Link key={item} to="/comparacao" className="placeholder-card border-slate-700 hover:border-teal-500 transition-all cursor-pointer">
@@ -70,15 +75,19 @@ export default function HomePage() {
 
       {/* 3. Bloco Sobre */}
       <section className="card-teal">
+        {/* Já estava com space-y-6, mantido */}
         <div className="md:w-3/5 space-y-6">
           <h2 className="title-lg">
             Sobre o <br /> DataEscola
           </h2>
-          <p className="text-teal-desc">
+
+          {/* Adicionado text-justify */}
+          <p className="text-teal-desc text-justify">
             A principal plataforma independente de tecnologia para visualizar e analisar dados oficiais do Censo da Educação Brasileira. Conheça nossa história, a metodologia aplicada e a equipe por trás do projeto.
           </p>
 
-          <div className="pt-2">
+          {/* Removido pt-2 para usar o espaçamento do container */}
+          <div>
             <Link to="/sobre" className="btn-secondary">
               Conheça o projeto
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

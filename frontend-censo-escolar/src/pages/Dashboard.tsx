@@ -312,7 +312,8 @@ function KpiCard({ kpi }: { kpi: KpiData }) {
 
   return (
     <div className="kpi-card group">
-      <div className="flex justify-between items-start mb-3">
+      {/* Margem inferior padronizada no layout do card */}
+      <div className="flex justify-between items-start mb-2">
         <div className="kpi-label">{kpi.label}</div>
         <span className={`text-xs font-bold ${changeColor}`}>{kpi.change}</span>
       </div>
@@ -329,15 +330,15 @@ function GradientLegend({ theme }: { theme: HeatmapTheme }) {
   const gradientCSS = `linear-gradient(to right, ${gradientStops.join(', ')})`;
 
   return (
-    <div className="gradient-legend">
-      <div className="flex justify-between items-center mb-2">
+    <div className="gradient-legend space-y-1.5">
+      <div className="flex justify-between items-center">
         <span className="text-xs font-bold text-slate-600">Intensidade — {theme.label}</span>
       </div>
       <div
         className="h-3 rounded-full shadow-inner"
         style={{ background: gradientCSS }}
       />
-      <div className="flex justify-between mt-1.5">
+      <div className="flex justify-between">
         <span className="text-[10px] text-slate-400 font-medium">Baixo</span>
         <span className="text-[10px] text-slate-400 font-medium">Médio</span>
         <span className="text-[10px] text-slate-400 font-medium">Alto</span>
@@ -358,7 +359,7 @@ function MunicipioHeader({ municipio, activeTheme }: { municipio: MunicipioInfo 
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </div>
-        <div>
+        <div className="space-y-0.5">
           <h1 className="text-xl font-bold text-slate-900">
             {municipio.nome}
             <span className="text-slate-400 font-normal ml-2 text-base">— {municipio.estado}</span>
@@ -444,7 +445,7 @@ export default function Dashboard() {
           {/* Logo do Dashboard */}
           <div className="pb-4 border-b border-slate-700/60">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
+              <div className="w-9 h-9 rounded-xl bg-linear-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                 </svg>
@@ -456,9 +457,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Seletor de Tema */}
-          <div>
-            <label className="filter-label mb-3 flex items-center gap-2">
+          {/* Seletor de Tema - Padronizado com space-y */}
+          <div className="space-y-3">
+            <label className="filter-label flex items-center gap-2">
               <svg className="w-3.5 h-3.5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
               </svg>
@@ -476,9 +477,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Filtros adicionais */}
-          <div className="border-t border-slate-700/60 pt-5">
-            <label className="filter-label mb-3 flex items-center gap-2">
+          {/* Filtros adicionais - Padronizado com space-y */}
+          <div className="border-t border-slate-700/60 pt-5 space-y-5">
+            <label className="filter-label flex items-center gap-2">
               <svg className="w-3.5 h-3.5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
               </svg>
@@ -486,8 +487,8 @@ export default function Dashboard() {
             </label>
 
             {/* Tipo de Escola */}
-            <div className="mb-4">
-              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-bold mb-2">Tipo de Escola</p>
+            <div className="space-y-2">
+              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-bold">Tipo de Escola</p>
               <div className="space-y-2">
                 {['Estadual', 'Municipal', 'Federal', 'Privada'].map((tipo) => (
                   <label key={tipo} className="flex items-center gap-3 cursor-pointer group">
@@ -506,8 +507,8 @@ export default function Dashboard() {
             </div>
 
             {/* Etapa de Ensino */}
-            <div className="mb-4">
-              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-bold mb-2">Etapa de Ensino</p>
+            <div className="space-y-2">
+              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-bold">Etapa de Ensino</p>
               <div className="flex flex-wrap gap-1.5">
                 {['Infantil', 'Fundamental', 'Médio', 'EJA'].map((etapa, i) => (
                   <button
@@ -522,8 +523,8 @@ export default function Dashboard() {
             </div>
 
             {/* Zona */}
-            <div>
-              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-bold mb-2">Zona</p>
+            <div className="space-y-2">
+              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-bold">Zona</p>
               <select className="filter-select" id="select-zona">
                 <option value="">Todas as zonas</option>
                 <option value="urbana">Urbana</option>
@@ -533,21 +534,24 @@ export default function Dashboard() {
           </div>
 
           {/* Botão Limpar */}
-          <button className="btn-clear" id="btn-clear-filters">
-            <span className="flex items-center justify-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-              Limpar Filtros
-            </span>
-          </button>
+          <div className="pt-2">
+            <button className="btn-clear w-full" id="btn-clear-filters">
+              <span className="flex items-center justify-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Limpar Filtros
+              </span>
+            </button>
+          </div>
 
         </div>
       </aside>
 
       {/* ================= MAIN CONTENT ================= */}
       <main className="dashboard-main">
-        <div className="dashboard-content">
+        {/* Usando space-y-6 para o espaçamento principal */}
+        <div className="dashboard-content space-y-6">
 
           {/* Header do Município */}
           <MunicipioHeader municipio={municipio} activeTheme={activeTheme} />

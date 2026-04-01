@@ -5,45 +5,45 @@ import manAvatar from '../assets/man.png';
 import womanAvatar from '../assets/woman.png';
 
 const teamMembers = [
-    { 
-        name: 'Ana Clara', 
-        role: 'Texto', 
-        avatar: womanAvatar, 
-        socials: { 
-            github: 'https://github.com/Anaarjo', 
-            linkedin: 'https://www.linkedin.com/in/ana-clara-rodrigues-de-araújo-453376111/', 
-            email: 'mailto:anaclara2002araujo@gmail.com' 
-        } 
+    {
+        name: 'Ana Clara',
+        role: 'Texto',
+        avatar: womanAvatar,
+        socials: {
+            github: 'https://github.com/Anaarjo',
+            linkedin: 'https://www.linkedin.com/in/ana-clara-rodrigues-de-araújo-453376111/',
+            email: 'mailto:anaclara2002araujo@gmail.com'
+        }
     },
-    { 
-        name: 'João Victor', 
-        role: 'Texto', 
-        avatar: manAvatar, 
-        socials: { 
-            github: 'https://github.com/jvvls', 
-            linkedin: 'https://www.linkedin.com/in/joaovictorvial/', 
-            email: 'mailto:joaovictorvial@gmail.com' 
-        } 
+    {
+        name: 'João Victor',
+        role: 'Texto',
+        avatar: manAvatar,
+        socials: {
+            github: 'https://github.com/jvvls',
+            linkedin: 'https://www.linkedin.com/in/joaovictorvial/',
+            email: 'mailto:joaovictorvial@gmail.com'
+        }
     },
-    { 
-        name: 'Paulo', 
-        role: 'Texto', 
-        avatar: manAvatar, 
-        socials: { 
-            github: 'https://github.com/paulocarmonaa', 
-            linkedin: 'https://www.linkedin.com/in/paulohenriquecarmonaramos/', 
-            email: 'mailto:paulo.carmona17@gmail.com' 
-        } 
+    {
+        name: 'Paulo',
+        role: 'Texto',
+        avatar: manAvatar,
+        socials: {
+            github: 'https://github.com/paulocarmonaa',
+            linkedin: 'https://www.linkedin.com/in/paulohenriquecarmonaramos/',
+            email: 'mailto:paulo.carmona17@gmail.com'
+        }
     },
-    { 
-        name: 'Pedro', 
-        role: 'Texto', 
-        avatar: manAvatar, 
-        socials: { 
-            github: 'https://github.com/PedroGCorrea', 
-            linkedin: 'https://www.linkedin.com/in/pedroguimaraescorrea/', 
-            email: 'mailto:pedrogdcorrea@gmail.com' 
-        } 
+    {
+        name: 'Pedro',
+        role: 'Texto',
+        avatar: manAvatar,
+        socials: {
+            github: 'https://github.com/PedroGCorrea',
+            linkedin: 'https://www.linkedin.com/in/pedroguimaraescorrea/',
+            email: 'mailto:pedrogdcorrea@gmail.com'
+        }
     },
 ];
 
@@ -67,7 +67,8 @@ export default function Sobre() {
                     </p>
                 </div>
                 <div className="about-hero-text">
-                    <p>
+                    {/* Adicionado text-justify */}
+                    <p className="text-justify">
                         O DataEscola é uma plataforma de visualização e análise de dados educacionais,
                         criada para tornar mais acessível a compreensão da infraestrutura escolar no
                         Brasil. Por meio de uma interface interativa, o sistema permite explorar o cenário
@@ -108,40 +109,46 @@ export default function Sobre() {
 
                         {/* Coluna Esquerda: Textos */}
                         <div className="lg:w-[45%] space-y-10">
-                            <section>
+                            {/* Adicionado space-y-4 para padronizar o espaçamento interno */}
+                            <section className="space-y-4">
                                 <h2 className="section-title">O projeto</h2>
-                                <p className="section-paragraph mb-4">
+                                {/* Adicionado text-justify e removido o mb-4 isolado */}
+                                <p className="section-paragraph text-justify">
                                     O DataEscola foi desenvolvido com a finalidade de organizar e apresentar dados sobre a infraestrutura educacional brasileira de forma mais intuitiva, visual e acessível. A proposta central é facilitar a interpretação de informações qualificadas, apoiando análises comparativas, investigações detalhadas e uma visão ampla do contexto nacional. Com isso, a plataforma busca reduzir a complexidade da leitura de bases educacionais e ampliar o acesso a informações relevantes para estudos, pesquisas e tomada de decisão.
                                 </p>
                             </section>
 
-                            <section>
+                            <section className="space-y-4">
                                 <h3 className="section-subtitle">O Problema</h3>
-                                <p className="section-paragraph">
+                                <p className="section-paragraph text-justify">
                                     O acesso a informações claras e organizadas sobre a infraestrutura escolar no Brasil ainda é um desafio. Embora existam bases públicas com grande volume de dados, muitas vezes essas informações estão dispersas, em formatos técnicos ou pouco intuitivos, o que dificulta a interpretação por estudantes, pesquisadores, gestores e pela sociedade em geral. Além disso, comparar realidades regionais, identificar desigualdades entre escolas e compreender indicadores educacionais de forma visual e acessível nem sempre é simples. A ausência de uma visualização centralizada e interativa limita a capacidade de análise e a tomada de decisão baseada em dados.
                                 </p>
                             </section>
 
-                            <section>
+                            <section className="space-y-4">
                                 <h3 className="section-subtitle">A Solução</h3>
-                                <p className="section-paragraph">
+                                <p className="section-paragraph text-justify">
                                     O <strong>DataEscola</strong> foi desenvolvido para transformar dados educacionais em informações mais acessíveis, visuais e compreensíveis. A plataforma reúne indicadores relevantes sobre a infraestrutura escolar e os apresenta em uma interface moderna, intuitiva e interativa. Por meio de gráficos, filtros e comparações, o sistema permite que o usuário explore os dados em diferentes níveis de detalhe, desde uma visão geral do cenário nacional até análises mais específicas por escola, região e critérios selecionados. O objetivo é apoiar a compreensão do panorama educacional brasileiro, facilitar análises comparativas e contribuir para uma leitura mais estratégica e transparente dos dados.
                                 </p>
                             </section>
 
                             {/* Card DataViva Integrado */}
-                            <section className="dataviva-card">
+                            {/* Adicionado space-y-4 para empurrar os elementos internamente de forma fluida */}
+                            <section className="dataviva-card space-y-4">
                                 <div className="dataviva-card-stripe"></div>
-                                <h3 className="dataviva-card-title">
+                                <h3 className="dataviva-card-title flex items-center gap-2">
                                     <svg className="w-5 h-5 text-[#1ab09d]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                                     Tecnologia DataViva
                                 </h3>
-                                <p className="section-paragraph mb-4">
+                                <p className="section-paragraph text-justify">
                                     O DataEscola é impulsionado pela expertise tecnológica do <strong>DataViva</strong>. Como plataforma parceira, o DataViva fornece a robustez em arquitetura de dados necessária para processar e visualizar o censo escolar de forma escalável e performática.
                                 </p>
-                                <a href="https://dataviva.info/" target="_blank" rel="noopener noreferrer" className="dataviva-card-link">
-                                    Conheça o DataViva <span aria-hidden="true">&rarr;</span>
-                                </a>
+                                {/* Transformado em block para respeitar o space-y-4 adequadamente */}
+                                <div className="pt-2">
+                                    <a href="https://dataviva.info/" target="_blank" rel="noopener noreferrer" className="dataviva-card-link inline-flex items-center gap-1">
+                                        Conheça o DataViva <span aria-hidden="true">&rarr;</span>
+                                    </a>
+                                </div>
                             </section>
                         </div>
 
@@ -150,30 +157,30 @@ export default function Sobre() {
 
                             {/* Mockup Placeholder - Censo Escolar */}
                             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                                {/* Substitua esta div pela tag <img /> do mockup real */}
                                 <div className="w-full aspect-4/3 bg-slate-100 flex items-center justify-center text-slate-400 font-mono text-sm border-b border-slate-200">
                                     [ IMAGEM DO DASHBOARD / MOCKUP ]
                                 </div>
                             </div>
 
                             <div className="space-y-6">
-                                <div>
+                                {/* Adicionado space-y-2 aos sub-tópicos para padronizar distância entre h4 e p */}
+                                <div className="space-y-2">
                                     <h4 className="feature-title">Visão geral da infraestrutura nacional</h4>
-                                    <p className="section-paragraph">Nesta seção, o usuário tem acesso a uma leitura ampla do cenário educacional brasileiro, com indicadores gerais sobre infraestrutura escolar em nível nacional. Essa visão permite identificar padrões, tendências e aspectos relevantes relacionados às condições das escolas no país.</p>
+                                    <p className="section-paragraph text-justify">Nesta seção, o usuário tem acesso a uma leitura ampla do cenário educacional brasileiro, com indicadores gerais sobre infraestrutura escolar em nível nacional. Essa visão permite identificar padrões, tendências e aspectos relevantes relacionados às condições das escolas no país.</p>
                                 </div>
-                                <div>
+                                <div className="space-y-2">
                                     <h4 className="feature-title">Análises comparativas regionais</h4>
-                                    <p className="section-paragraph">A plataforma também oferece recursos para comparar diferentes contextos regionais. Por meio de filtros e seleções, o usuário pode analisar escolas, localidades ou grupos específicos, observando diferenças e semelhanças entre os dados apresentados.</p>
+                                    <p className="section-paragraph text-justify">A plataforma também oferece recursos para comparar diferentes contextos regionais. Por meio de filtros e seleções, o usuário pode analisar escolas, localidades ou grupos específicos, observando diferenças e semelhanças entre os dados apresentados.</p>
                                 </div>
-                                <div>
+                                <div className="space-y-2">
                                     <h4 className="feature-title">Análises detalhadas</h4>
-                                    <p className="section-paragraph">Para uma exploração mais aprofundada, o sistema disponibiliza análises detalhadas que permitem examinar informações específicas de forma mais precisa. Essa funcionalidade é útil para usuários que desejam investigar recortes particulares e compreender melhor determinados indicadores.</p>
+                                    <p className="section-paragraph text-justify">Para uma exploração mais aprofundada, o sistema disponibiliza análises detalhadas que permitem examinar informações específicas de forma mais precisa. Essa funcionalidade é útil para usuários que desejam investigar recortes particulares e compreender melhor determinados indicadores.</p>
                                 </div>
                             </div>
 
-                            <div>
-                                <h4 className="feature-title mb-2">Público-alvo</h4>
-                                <p className="text-sm text-slate-600 mb-2">O projeto pode ser útil para:</p>
+                            <div className="space-y-2">
+                                <h4 className="feature-title">Público-alvo</h4>
+                                <p className="text-sm text-slate-600">O projeto pode ser útil para:</p>
                                 <ul className="list-disc pl-5 text-sm text-slate-600 space-y-1">
                                     <li>estudantes e pesquisadores</li>
                                     <li>gestores educacionais</li>

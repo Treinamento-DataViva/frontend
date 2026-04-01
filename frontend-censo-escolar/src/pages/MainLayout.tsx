@@ -20,58 +20,60 @@ export default function MainLayout() {
     <div className={`flex flex-col bg-slate-50 ${isFullScreenPage ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
 
       {/* HEADER: Inspirado no DataViva com Animação */}
-      <header className="header-container">
-        <div className="header-content">
+      <header className="header-container w-full flex justify-center">
+        <div className="w-full max-w-7xl mx-auto px-9">
 
-          {/* Logo DataEscola */}
-          <Link to="/" className="logo-link">
-            <span className="logo-text-dark">Data</span>
-            <span className="logo-text-teal">Escola</span>
-          </Link>
+          <div className="header-content flex justify-between items-center w-full">
 
-          {/* Área de Navegação e Ações */}
-          <div className="flex items-center gap-4">
+            {/* Logo DataEscola */}
+            <Link to="/" className="logo-link">
+              <span className="logo-text-dark">Data</span>
+              <span className="logo-text-teal">Escola</span>
+            </Link>
 
-            {/* Pílula de Navegação com Slide */}
-            <nav className="nav-pill-container">
+            {/* Área de Navegação e Ações */}
+            <div className="flex items-center gap-4">
 
-              {/* Fundo animado (só aparece se alguma aba do menu estiver ativa) */}
-              {activeIndex >= 0 && (
-                <div
-                  className="nav-pill-slider"
-                  style={{ transform: `translateX(${activeIndex * 100}%)` }}
-                />
-              )}
+              {/* Pílula de Navegação com Slide */}
+              <nav className="nav-pill-container">
 
-              {/* Links */}
-              {navItems.map((item, index) => {
-                const isActive = activeIndex === index;
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`nav-item-btn ${isActive ? 'text-white' : 'text-slate-600 hover:text-slate-900'}`}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
+                {/* Fundo animado */}
+                {activeIndex >= 0 && (
+                  <div
+                    className="nav-pill-slider"
+                    style={{ transform: `translateX(${activeIndex * 100}%)` }}
+                  />
+                )}
 
-            {/* Botão Externo DataViva */}
-            <a
-              href="https://dataviva.info"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-external"
-            >
-              <div className="btn-external-icon">
-                DV
-              </div>
-              Conhecer o DataViva
-            </a>
+                {/* Links */}
+                {navItems.map((item, index) => {
+                  const isActive = activeIndex === index;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`nav-item-btn ${isActive ? 'text-white' : 'text-slate-600 hover:text-slate-900'}`}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              {/* Botão Externo DataViva */}
+              <a
+                href="https://dataviva.info"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-external"
+              >
+                <div className="btn-external-icon">
+                  DV
+                </div>
+                Conhecer o DataViva
+              </a>
+            </div>
           </div>
-
         </div>
       </header>
 
@@ -84,9 +86,9 @@ export default function MainLayout() {
       {!isFullScreenPage && (
         <footer className="footer-container">
           <div className="footer-content">
-
             <Link to="/" className="logo-link hover:opacity-100 opacity-90">
-              <span className="logo-text-dark text-white">Data</span>
+              {/* Mantemos a classe para a fonte/tamanho, mas forçamos a cor para branco com estilo inline */}
+              <span className="logo-text-dark" style={{ color: '#ffffff' }}>Data</span>
               <span className="logo-text-teal">Escola</span>
             </Link>
 

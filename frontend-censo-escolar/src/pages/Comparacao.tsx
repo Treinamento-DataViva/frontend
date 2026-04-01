@@ -341,13 +341,15 @@ export default function ComparativaRegional() {
       {/* SIDEBAR */}
       <aside className="w-64 bg-slate-800 text-white rounded-xl p-6 h-fit sticky top-24 shrink-0">
         <div className="space-y-6">
-          <div>
-            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
-              Configuração de Comparação
-            </h3>
 
+          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+            Configuração de Comparação
+          </h3>
+
+          {/* Container padronizado para os inputs sem usar mb-* avulsos */}
+          <div className="space-y-4">
             {/* Ano */}
-            <div className="mb-4">
+            <div>
               <label className="block text-sm text-slate-300 mb-1">Ano</label>
               <select
                 value={ano}
@@ -361,7 +363,7 @@ export default function ComparativaRegional() {
             </div>
 
             {/* Região A */}
-            <div className="mb-3">
+            <div>
               <label className="block text-sm text-slate-300 mb-1">Região Alvo (A)</label>
               <select
                 value={regiaoA}
@@ -409,17 +411,19 @@ export default function ComparativaRegional() {
 
       {/* CONTEÚDO */}
       <div className="flex-1 space-y-6">
+
         {/* HEADER */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">
+          <div className="flex items-start justify-between">
+            {/* Agrupamento com space-y-2 para os textos respirarem melhor */}
+            <div className="space-y-2">
+              <p className="text-xs text-slate-500 uppercase tracking-wide">
                 Explorador · Ferramenta de Avaliação Comparativa
               </p>
               <h1 className="text-3xl font-bold text-slate-900">
                 Análises Comparativas Regionais
               </h1>
-              <p className="text-sm text-slate-600 mt-2">
+              <p className="text-sm text-slate-600">
                 Comparando <strong>{dadosRegiaoA?.nome ?? regiaoA}</strong> com{" "}
                 <strong>{dadosRegiaoB?.nome ?? regiaoB}</strong> — Censo {ano}.
               </p>
@@ -441,11 +445,11 @@ export default function ComparativaRegional() {
 
         {/* CARDS */}
         <div className="grid grid-cols-2 gap-6">
-          <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-sm border border-blue-200 p-6">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="bg-linear-to-br from-blue-50 to-white rounded-xl shadow-sm border border-blue-200 p-6 flex flex-col justify-between">
+            <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">A</div>
               <div>
-                <p className="text-xs text-slate-500 font-medium">REGIÃO ALVO</p>
+                <p className="text-xs text-slate-500 font-medium uppercase">Região Alvo</p>
                 <h3 className="text-lg font-bold text-slate-900">{dadosRegiaoA?.nome ?? regiaoA}</h3>
               </div>
             </div>
@@ -465,11 +469,11 @@ export default function ComparativaRegional() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="bg-linear-to-br from-slate-50 to-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
+            <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center text-white font-bold">B</div>
               <div>
-                <p className="text-xs text-slate-500 font-medium">REFERÊNCIA</p>
+                <p className="text-xs text-slate-500 font-medium uppercase">Referência</p>
                 <h3 className="text-lg font-bold text-slate-900">{dadosRegiaoB?.nome ?? regiaoB}</h3>
               </div>
             </div>
@@ -549,7 +553,7 @@ export default function ComparativaRegional() {
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-slate-700">Matriz de Dados Detalhada</h3>
-            <p className="text-xs text-slate-500">Censo Escolar {ano}</p>
+            <p className="text-xs text-slate-500 font-medium">Censo Escolar {ano}</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -583,9 +587,8 @@ export default function ComparativaRegional() {
                         {ind.valorB}{ind.unidade}
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                          isPositive ? "bg-teal-50 text-teal-700" : diff === 0 ? "bg-slate-100 text-slate-600" : "bg-red-50 text-red-700"
-                        }`}>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${isPositive ? "bg-teal-50 text-teal-700" : diff === 0 ? "bg-slate-100 text-slate-600" : "bg-red-50 text-red-700"
+                          }`}>
                           {isPositive ? "+" : ""}{diffPct}%{" "}
                           {isPositive ? "ACIMA" : diff === 0 ? "IGUAL" : "ABAIXO"}
                         </span>
@@ -597,6 +600,7 @@ export default function ComparativaRegional() {
             </table>
           </div>
         </div>
+
       </div>
     </div>
   );
