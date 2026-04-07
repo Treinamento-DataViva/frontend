@@ -504,12 +504,6 @@ function MunicipioHeader({ municipio, activeTheme }: { municipio: MunicipioInfo 
         <span className="px-3 py-1.5 bg-teal-50 text-teal-700 rounded-lg font-semibold border border-teal-100">
           {activeTheme.label}
         </span>
-        <button className="btn-header-outline flex items-center gap-2" id="btn-export-report">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          Exportar
-        </button>
       </div>
     </div>
   );
@@ -722,7 +716,7 @@ export default function Dashboard() {
                 >
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
-                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                    url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
                   />
 
                   {!isLoading && (
