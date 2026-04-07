@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, type FormEvent } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -40,12 +40,7 @@ interface HeatmapTheme {
 
 interface MunicipioInfo {
   codigo: string;
-  nome: string;
-  estado: string;
-  populacao: number;
   totalEscolas: number;
-  center: [number, number];
-  zoom: number;
 }
 
 interface KpiData {
@@ -59,6 +54,48 @@ interface DashboardData {
   municipio: MunicipioInfo;
   heatmapPoints: HeatmapPoint[];
   kpis: KpiData[];
+  bounds: [[number, number], [number, number]] | null;
+}
+
+interface IndicadoresApiResponse {
+  total_escolas: number;
+  agua_potavel: number;
+  agua_inexistente: number;
+  energia_inexistente: number;
+  esgoto_inexistente: number;
+  tratamento_lixo_inexistente: number;
+  banheiro: number;
+  biblioteca: number;
+  cozinha: number;
+  dormitorio_aluno: number;
+  laboratorio_informatica: number;
+  laboratorio_ciencias: number;
+  quadra_esportes: number;
+  refeitorio: number;
+  alimentacao: number;
+}
+
+interface EscolaGeoResponse {
+  id_escola: number;
+  geometry: string;
+  ano: number;
+  nome_escola: string;
+  sigla_uf: string;
+  rede: string;
+  agua_potavel: boolean;
+  agua_inexistente: boolean;
+  energia_inexistente: boolean;
+  esgoto_inexistente: boolean;
+  tratamento_lixo_inexistente: boolean;
+  banheiro: boolean;
+  biblioteca: boolean;
+  cozinha: boolean;
+  dormitorio_aluno: boolean;
+  laboratorio_informatica: boolean;
+  laboratorio_ciencias: boolean;
+  quadra_esportes: boolean;
+  refeitorio: boolean;
+  alimentacao: boolean;
 }
 
 // ============================================================
@@ -72,14 +109,6 @@ const heatmapThemes: HeatmapTheme[] = [
     description: 'Índice geral de infraestrutura escolar',
     icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
     gradient: { 0.0: '#0d1b2a', 0.2: '#1b3a5c', 0.4: '#2a6f97', 0.6: '#40c9a2', 0.8: '#a8e6cf', 1.0: '#dcedc1' },
-    unit: '%',
-  },
-  {
-    id: 'internet',
-    label: 'Acesso à Internet',
-    description: 'Cobertura de internet nas escolas',
-    icon: 'M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.14 0M1.394 9.393c5.857-5.858 15.355-5.858 21.213 0',
-    gradient: { 0.0: '#1a0533', 0.2: '#4a0e6b', 0.4: '#7b2d8e', 0.6: '#c24cf6', 0.8: '#da85ff', 1.0: '#f0c6ff' },
     unit: '%',
   },
   {
@@ -109,108 +138,200 @@ const heatmapThemes: HeatmapTheme[] = [
 ];
 
 // ============================================================
-// Dados Mockados — Município de Belo Horizonte (MG)
+// Configuração de API
 // ============================================================
 
-const beloHorizonte: MunicipioInfo = {
-  codigo: '3106200',
-  nome: 'Belo Horizonte',
-  estado: 'MG',
-  populacao: 2521564,
-  totalEscolas: 1247,
-  center: [-19.9191, -43.9386],
-  zoom: 12,
-};
+const BASE_URL = 'http://localhost:8000';
 
-function generateMockHeatmapPoints(
-  center: [number, number],
-  count: number,
-  themeId: string
-): HeatmapPoint[] {
-  const seed = themeId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  const pseudoRandom = (i: number) => {
-    const x = Math.sin(seed * 9301 + i * 49297 + 233280) * 49297;
-    return x - Math.floor(x);
-  };
+function parsePointFromGeometry(geometry: string): [number, number] | null {
+  const trimmed = geometry.trim();
+  const hexCandidate = trimmed.startsWith('\\x') || trimmed.startsWith('0x')
+    ? trimmed.slice(2)
+    : trimmed;
 
-  const points: HeatmapPoint[] = [];
-  const clusters = [
-    { lat: center[0] + 0.02, lng: center[1] - 0.03, weight: 0.9 },
-    { lat: center[0] - 0.01, lng: center[1] + 0.01, weight: 0.7 },
-    { lat: center[0] + 0.04, lng: center[1] + 0.02, weight: 0.5 },
-    { lat: center[0] - 0.03, lng: center[1] - 0.02, weight: 0.3 },
-    { lat: center[0] + 0.01, lng: center[1] + 0.04, weight: 0.6 },
-    { lat: center[0] - 0.04, lng: center[1] + 0.03, weight: 0.4 },
-    { lat: center[0], lng: center[1], weight: 0.85 },
-    { lat: center[0] + 0.03, lng: center[1] - 0.01, weight: 0.55 },
-  ];
+  const hexMatch = hexCandidate.match(/^[0-9a-fA-F]+$/);
+  if (hexMatch) {
+    if (hexCandidate.length % 2 !== 0) return null;
+    const bytes = new Uint8Array(hexCandidate.length / 2);
+    for (let i = 0; i < hexCandidate.length; i += 2) {
+      bytes[i / 2] = Number.parseInt(hexCandidate.slice(i, i + 2), 16);
+    }
 
-  for (let i = 0; i < count; i++) {
-    const clusterIdx = Math.floor(pseudoRandom(i * 3) * clusters.length);
-    const cluster = clusters[clusterIdx];
-    const latOffset = (pseudoRandom(i * 7 + 1) - 0.5) * 0.04;
-    const lngOffset = (pseudoRandom(i * 11 + 2) - 0.5) * 0.04;
-    const baseIntensity = cluster.weight;
-    const variation = (pseudoRandom(i * 13 + 3) - 0.5) * 0.3;
-    const intensity = Math.max(0.05, Math.min(1.0, baseIntensity + variation));
+    const dataView = new DataView(bytes.buffer);
+    const littleEndian = dataView.getUint8(0) === 1;
+    const geomType = dataView.getUint32(1, littleEndian);
+    const hasSrid = (geomType & 0x20000000) !== 0;
+    const baseType = geomType & 0x0fffffff;
 
-    points.push({ lat: cluster.lat + latOffset, lng: cluster.lng + lngOffset, intensity });
+    if (baseType === 1) {
+      let offset = 5;
+      if (hasSrid) {
+        offset += 4;
+      }
+
+      const x = dataView.getFloat64(offset, littleEndian);
+      const y = dataView.getFloat64(offset + 8, littleEndian);
+      if (Number.isFinite(x) && Number.isFinite(y)) return [y, x];
+    }
+
+    return null;
   }
 
-  return points;
+  const wktCandidate = trimmed.includes(';') ? trimmed.split(';').pop() || trimmed : trimmed;
+  const wktMatch = wktCandidate.match(/POINT\s*\(\s*(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s*\)/i);
+  if (wktMatch) {
+    const lng = Number(wktMatch[1]);
+    const lat = Number(wktMatch[2]);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) return [lat, lng];
+  }
+
+  const jsonMatch = trimmed.match(/-?\d+(?:\.\d+)?/g);
+  if (jsonMatch && jsonMatch.length >= 2) {
+    const [lngStr, latStr] = jsonMatch;
+    const lng = Number(lngStr);
+    const lat = Number(latStr);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) return [lat, lng];
+  }
+
+  return null;
 }
 
-function getMockKpis(themeId: string): KpiData[] {
+function resolveThemeMetric(themeId: string, escola: EscolaGeoResponse): boolean {
+  switch (themeId) {
+    case 'infraestrutura':
+      return (
+        escola.agua_potavel &&
+        !escola.energia_inexistente &&
+        !escola.esgoto_inexistente &&
+        !escola.tratamento_lixo_inexistente
+      );
+    case 'laboratorio':
+      return escola.laboratorio_ciencias || escola.laboratorio_informatica;
+    case 'acessibilidade':
+      return escola.banheiro;
+    case 'alimentacao':
+      return escola.alimentacao || escola.refeitorio || escola.cozinha;
+    case 'internet':
+      return false;
+    default:
+      return true;
+  }
+}
+
+function buildHeatmapPointsFromEscolas(
+  escolas: EscolaGeoResponse[],
+  themeId: string
+): HeatmapPoint[] {
+  return escolas.reduce<HeatmapPoint[]>((acc, escola) => {
+    const coords = parsePointFromGeometry(escola.geometry);
+    if (!coords) return acc;
+    const intensity = resolveThemeMetric(themeId, escola) ? 1.0 : 0.25;
+    acc.push({ lat: coords[0], lng: coords[1], intensity });
+    return acc;
+  }, []);
+}
+
+function buildMunicipioInfo(codigoMunicipio: string, totalEscolas: number): MunicipioInfo {
+  return {
+    codigo: codigoMunicipio,
+    totalEscolas,
+  };
+}
+
+function computeBounds(points: HeatmapPoint[]): [[number, number], [number, number]] | null {
+  if (points.length === 0) return null;
+
+  let minLat = Number.POSITIVE_INFINITY;
+  let maxLat = Number.NEGATIVE_INFINITY;
+  let minLng = Number.POSITIVE_INFINITY;
+  let maxLng = Number.NEGATIVE_INFINITY;
+
+  for (const point of points) {
+    minLat = Math.min(minLat, point.lat);
+    maxLat = Math.max(maxLat, point.lat);
+    minLng = Math.min(minLng, point.lng);
+    maxLng = Math.max(maxLng, point.lng);
+  }
+
+  return [
+    [minLat, minLng],
+    [maxLat, maxLng],
+  ];
+}
+
+function buildKpis(themeId: string, data: IndicadoresApiResponse): KpiData[] {
+  const total = data.total_escolas;
+  const pct = (value: number) => (total > 0 ? ((value / total) * 100).toFixed(1) : '0.0');
+  const pctInverse = (value: number) =>
+    (total > 0 ? (100 - (value / total) * 100).toFixed(1) : '0.0');
+
+  const baseKpi = (label: string, value: string): KpiData => ({
+    label,
+    value,
+    change: 'Atual',
+    changeType: 'neutral',
+  });
+
   const kpisByTheme: Record<string, KpiData[]> = {
     infraestrutura: [
-      { label: 'Índice Geral', value: '68.4%', change: '+2.3%', changeType: 'positive' },
-      { label: 'Escolas Adequadas', value: '854', change: '+45', changeType: 'positive' },
-      { label: 'Escolas Críticas', value: '93', change: '-12', changeType: 'positive' },
-      { label: 'Investimento/Escola', value: 'R$ 42k', change: '+8.1%', changeType: 'positive' },
-    ],
-    internet: [
-      { label: 'Cobertura Total', value: '72.3%', change: '+5.7%', changeType: 'positive' },
-      { label: 'Banda Larga', value: '58.1%', change: '+12.4%', changeType: 'positive' },
-      { label: 'Sem Acesso', value: '346', change: '-89', changeType: 'positive' },
-      { label: 'Vel. Média', value: '45 Mbps', change: '+15 Mbps', changeType: 'positive' },
+      baseKpi('Água potável', `${pct(data.agua_potavel)}%`),
+      baseKpi('Energia elétrica', `${pctInverse(data.energia_inexistente)}%`),
+      baseKpi('Esgoto', `${pctInverse(data.esgoto_inexistente)}%`),
+      baseKpi('Trat. de lixo', `${pctInverse(data.tratamento_lixo_inexistente)}%`),
     ],
     laboratorio: [
-      { label: 'Com Laboratório', value: '45.2%', change: '+3.1%', changeType: 'positive' },
-      { label: 'Lab. Informática', value: '564', change: '+28', changeType: 'positive' },
-      { label: 'Lab. Ciências', value: '198', change: '-5', changeType: 'negative' },
-      { label: 'Equipamentos/Lab', value: '22', change: '+4', changeType: 'positive' },
-    ],
-    acessibilidade: [
-      { label: 'Índice Acessib.', value: '54.8%', change: '+4.2%', changeType: 'positive' },
-      { label: 'Rampas', value: '687', change: '+102', changeType: 'positive' },
-      { label: 'Banh. Adaptados', value: '412', change: '+56', changeType: 'positive' },
-      { label: 'Pisos Táteis', value: '234', change: '+88', changeType: 'positive' },
+      baseKpi('Lab. Informática', `${pct(data.laboratorio_informatica)}%`),
+      baseKpi('Lab. Ciências', `${pct(data.laboratorio_ciencias)}%`),
+      baseKpi('Biblioteca', `${pct(data.biblioteca)}%`),
+      baseKpi('Cozinha', `${pct(data.cozinha)}%`),
     ],
     alimentacao: [
-      { label: 'Com Refeitório', value: '88.3%', change: 'Estável', changeType: 'neutral' },
-      { label: 'Cozinha Própria', value: '1.102', change: '+15', changeType: 'positive' },
-      { label: 'Nutricionista', value: '92.1%', change: '+1.8%', changeType: 'positive' },
-      { label: 'Refeições/Dia', value: '245k', change: '+12k', changeType: 'positive' },
+      baseKpi('Refeitório', `${pct(data.refeitorio)}%`),
+      baseKpi('Cozinha', `${pct(data.cozinha)}%`),
+      baseKpi('Alimentação', `${pct(data.alimentacao)}%`),
+      baseKpi('Dormitório aluno', `${pct(data.dormitorio_aluno)}%`),
+    ],
+    acessibilidade: [
+      baseKpi('Banheiro', `${pct(data.banheiro)}%`),
+      baseKpi('Quadra esportes', `${pct(data.quadra_esportes)}%`),
+      baseKpi('Biblioteca', `${pct(data.biblioteca)}%`),
+      baseKpi('Cozinha', `${pct(data.cozinha)}%`),
     ],
   };
+
   return kpisByTheme[themeId] || kpisByTheme['infraestrutura'];
 }
 
 /**
  * Busca os dados do dashboard para um município e tema específicos.
- *
- * TODO: Substituir pela chamada real à API:
- * GET /api/v1/dashboard/{codigoMunicipio}?tema={themeId}
  */
 async function fetchDashboardData(
-  _codigoMunicipio: string,
+  codigoMunicipio: string,
   themeId: string
 ): Promise<DashboardData> {
-  await new Promise((resolve) => setTimeout(resolve, 400));
-  const municipio = beloHorizonte;
-  const heatmapPoints = generateMockHeatmapPoints(municipio.center, 200, themeId);
-  const kpis = getMockKpis(themeId);
-  return { municipio, heatmapPoints, kpis };
+  const res = await fetch(
+    `${BASE_URL}/escolas/municipios/${codigoMunicipio}/indicadores`
+  );
+
+  if (!res.ok) {
+    throw new Error(`Erro ao buscar indicadores do município ${codigoMunicipio}`);
+  }
+
+  const indicadores: IndicadoresApiResponse = await res.json();
+
+  const geoRes = await fetch(
+    `${BASE_URL}/escolas/municipios/${codigoMunicipio}`
+  );
+  if (!geoRes.ok) {
+    throw new Error(`Erro ao buscar escolas do município ${codigoMunicipio}`);
+  }
+  const escolas: EscolaGeoResponse[] = await geoRes.json();
+
+  const heatmapPoints = buildHeatmapPointsFromEscolas(escolas, themeId);
+  const bounds = computeBounds(heatmapPoints);
+  const municipio = buildMunicipioInfo(codigoMunicipio, indicadores.total_escolas);
+  const kpis = buildKpis(themeId, indicadores);
+  return { municipio, heatmapPoints, kpis, bounds };
 }
 
 // ============================================================
@@ -259,6 +380,17 @@ function HeatmapLayer({ points, options = {} }: HeatmapLayerProps) {
       }
     };
   }, [map, points, options]);
+
+  return null;
+}
+
+function FitBounds({ bounds }: { bounds: [[number, number], [number, number]] }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!bounds) return;
+    map.fitBounds(bounds, { padding: [24, 24] });
+  }, [map, bounds]);
 
   return null;
 }
@@ -361,12 +493,10 @@ function MunicipioHeader({ municipio, activeTheme }: { municipio: MunicipioInfo 
         </div>
         <div className="space-y-0.5">
           <h1 className="text-xl font-bold text-slate-900">
-            {municipio.nome}
-            <span className="text-slate-400 font-normal ml-2 text-base">— {municipio.estado}</span>
+            Município {municipio.codigo}
           </h1>
           <p className="text-sm text-slate-500">
-            {municipio.totalEscolas.toLocaleString('pt-BR')} escolas • Pop.{' '}
-            {municipio.populacao.toLocaleString('pt-BR')}
+            {municipio.totalEscolas.toLocaleString('pt-BR')} escolas
           </p>
         </div>
       </div>
@@ -391,9 +521,12 @@ function MunicipioHeader({ municipio, activeTheme }: { municipio: MunicipioInfo 
 
 export default function Dashboard() {
   const [activeThemeId, setActiveThemeId] = useState<string>('infraestrutura');
+  const [codigoMunicipio, setCodigoMunicipio] = useState<string>('3106200');
+  const [codigoMunicipioInput, setCodigoMunicipioInput] = useState<string>('3106200');
   const [heatmapPoints, setHeatmapPoints] = useState<HeatmapPoint[]>([]);
   const [kpis, setKpis] = useState<KpiData[]>([]);
   const [municipio, setMunicipio] = useState<MunicipioInfo | null>(null);
+  const [mapBounds, setMapBounds] = useState<[[number, number], [number, number]] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const activeTheme = useMemo(
@@ -413,13 +546,15 @@ export default function Dashboard() {
     [activeTheme]
   );
 
-  const loadData = useCallback(async (themeId: string) => {
+  const loadData = useCallback(async (themeId: string, municipioCodigo: string) => {
+    if (!municipioCodigo) return;
     setIsLoading(true);
     try {
-      const data = await fetchDashboardData('3106200', themeId);
+      const data = await fetchDashboardData(municipioCodigo, themeId);
       setMunicipio(data.municipio);
       setHeatmapPoints(data.heatmapPoints);
       setKpis(data.kpis);
+      setMapBounds(data.bounds);
     } catch (err) {
       console.error('Erro ao carregar dados do dashboard:', err);
     } finally {
@@ -428,11 +563,19 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    loadData(activeThemeId);
-  }, [activeThemeId, loadData]);
+    loadData(activeThemeId, codigoMunicipio);
+  }, [activeThemeId, codigoMunicipio, loadData]);
 
   const handleThemeChange = (themeId: string) => {
     setActiveThemeId(themeId);
+  };
+
+  const handleMunicipioSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = codigoMunicipioInput.trim();
+    if (trimmed && trimmed !== codigoMunicipio) {
+      setCodigoMunicipio(trimmed);
+    }
   };
 
   return (
@@ -486,41 +629,25 @@ export default function Dashboard() {
               Filtros
             </label>
 
-            {/* Tipo de Escola */}
-            <div className="space-y-2">
-              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-bold">Tipo de Escola</p>
-              <div className="space-y-2">
-                {['Estadual', 'Municipal', 'Federal', 'Privada'].map((tipo) => (
-                  <label key={tipo} className="flex items-center gap-3 cursor-pointer group">
-                    <div className="relative flex items-center">
-                      <input type="checkbox" className="peer sr-only" defaultChecked />
-                      <div className="checkbox-custom">
-                        <svg className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                    </div>
-                    <span className="checkbox-text">{tipo}</span>
-                  </label>
-                ))}
+            {/* Código do Município */}
+            <form onSubmit={handleMunicipioSubmit} className="space-y-2">
+              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-bold">
+                Código do Município
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  className="filter-select flex-1"
+                  placeholder="Ex: 3106200"
+                  value={codigoMunicipioInput}
+                  onChange={(event) => setCodigoMunicipioInput(event.target.value)}
+                />
+                <button type="submit" className="btn-header-outline px-3 py-2 text-xs">
+                  Aplicar
+                </button>
               </div>
-            </div>
-
-            {/* Etapa de Ensino */}
-            <div className="space-y-2">
-              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-bold">Etapa de Ensino</p>
-              <div className="flex flex-wrap gap-1.5">
-                {['Infantil', 'Fundamental', 'Médio', 'EJA'].map((etapa, i) => (
-                  <button
-                    key={etapa}
-                    className={i < 2 ? 'tag-active' : 'tag-inactive'}
-                    id={`etapa-${etapa.toLowerCase()}`}
-                  >
-                    {etapa}
-                  </button>
-                ))}
-              </div>
-            </div>
+            </form>
 
             {/* Zona */}
             <div className="space-y-2">
@@ -583,10 +710,13 @@ export default function Dashboard() {
               <GradientLegend theme={activeTheme} />
             </div>
             <div className="map-wrapper">
-              {municipio && (
+              {municipio && mapBounds && heatmapPoints.length > 0 && (
                 <MapContainer
-                  center={municipio.center}
-                  zoom={municipio.zoom}
+                  center={[
+                    (mapBounds[0][0] + mapBounds[1][0]) / 2,
+                    (mapBounds[0][1] + mapBounds[1][1]) / 2,
+                  ]}
+                  zoom={12}
                   className="w-full h-full"
                   key={`map-${municipio.codigo}`}
                 >
@@ -595,11 +725,14 @@ export default function Dashboard() {
                     url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                   />
 
-                  {!isLoading && heatmapPoints.length > 0 && (
-                    <HeatmapLayer
-                      points={heatmapPoints}
-                      options={heatmapOptions}
-                    />
+                  {!isLoading && (
+                    <>
+                      <FitBounds bounds={mapBounds} />
+                      <HeatmapLayer
+                        points={heatmapPoints}
+                        options={heatmapOptions}
+                      />
+                    </>
                   )}
                 </MapContainer>
               )}
