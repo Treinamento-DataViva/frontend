@@ -3,8 +3,6 @@ import ReactECharts from "echarts-for-react";
 import { Download, Share2 } from "lucide-react";
 
 const BASE_URL = "http://localhost:8000";
-const ANOS = [2024, 2023, 2022, 2021, 2020, 2019];
-
 const ESTADOS = [
   { sigla: "AC", nome: "Acre" },
   { sigla: "AL", nome: "Alagoas" },
@@ -124,10 +122,36 @@ async function fetchStats(sigla_uf: string, ano: number): Promise<RegionalStats>
   return calcularStats(data);
 }
 
+function extractAvailableYearsFromUfData(data: unknown): number[] {
+  if (!Array.isArray(data)) return [];
+  const years = data
+    .map((item) => (typeof (item as { ano?: unknown }).ano === "number" ? (item as { ano: number }).ano : null))
+    .filter((year): year is number => Number.isFinite(year));
+  return Array.from(new Set(years)).sort((a, b) => b - a);
+}
+
+async function fetchAvailableYears(sigla_uf: string): Promise<number[]> {
+  const res = await fetch(`${BASE_URL}/escolas/uf/${sigla_uf}/anos`);
+  if (!res.ok) return [];
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
+}
+
+function mergeAvailableYears(a: number[], b: number[]): number[] {
+  if (a.length > 0 && b.length > 0) {
+    const setB = new Set(b);
+    return a.filter((year) => setB.has(year));
+  }
+  if (a.length > 0) return a;
+  if (b.length > 0) return b;
+  return [];
+}
+
 export default function ComparativaRegional() {
   const [regiaoA, setRegiaoA] = useState("SP");
   const [regiaoB, setRegiaoB] = useState("BR");
   const [ano, setAno] = useState(2023);
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [dadosRegiaoA, setDadosRegiaoA] = useState<RegionalStats | null>(null);
   const [dadosRegiaoB, setDadosRegiaoB] = useState<RegionalStats | null>(null);
   const [loading, setLoading] = useState(false);
@@ -154,9 +178,22 @@ export default function ComparativaRegional() {
     setLoading(true);
     setErro(null);
     try {
+      const [anosA, anosB] = await Promise.all([
+        fetchAvailableYears(regiaoA),
+        fetchAvailableYears(regiaoB),
+      ]);
+      const anosDisponiveis = mergeAvailableYears(anosA, anosB);
+      setAvailableYears(anosDisponiveis);
+
+      let anoSelecionado = ano;
+      if (anosDisponiveis.length > 0 && !anosDisponiveis.includes(ano)) {
+        anoSelecionado = anosDisponiveis[0];
+        setAno(anoSelecionado);
+      }
+
       const [a, b] = await Promise.all([
-        fetchStats(regiaoA, ano),
-        fetchStats(regiaoB, ano),
+        fetchStats(regiaoA, anoSelecionado),
+        fetchStats(regiaoB, anoSelecionado),
       ]);
       setDadosRegiaoA(a);
       setDadosRegiaoB(b);
@@ -356,9 +393,13 @@ export default function ComparativaRegional() {
                 onChange={(e) => setAno(Number(e.target.value))}
                 className="w-full bg-slate-700 text-white rounded-lg px-3 py-2 text-sm border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {ANOS.map((a) => (
-                  <option key={a} value={a}>{a}</option>
-                ))}
+                {availableYears.length === 0 ? (
+                  <option value={ano}>{ano}</option>
+                ) : (
+                  availableYears.map((a) => (
+                    <option key={a} value={a}>{a}</option>
+                  ))
+                )}
               </select>
             </div>
 
