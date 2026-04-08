@@ -44,6 +44,12 @@ interface MunicipioInfo {
   displayName?: string;
 }
 
+interface MunicipioSugestao {
+  codigo: number;
+  nome: string;
+  uf: string;
+}
+
 interface KpiData {
   label: string;
   value: string;
@@ -249,6 +255,62 @@ function buildMunicipioInfo(codigoMunicipio: string, totalEscolas: number, displ
     totalEscolas,
     displayName,
   };
+}
+
+async function fetchMunicipioSugestoes(termo: string): Promise<MunicipioSugestao[]> {
+  if (!termo.trim()) return [];
+  const encodedTermo = encodeURIComponent(termo.trim());
+  try {
+    const res = await fetch(`${BASE_URL}/escolas/municipios/${encodedTermo}`);
+    if (res.ok) {
+      const data = await res.json();
+      // Verifica se é uma lista de sugestões (array com objetos que têm codigo, nome, uf)
+      if (Array.isArray(data) && data.length > 0) {
+        const firstItem = data[0];
+        if (typeof firstItem === 'object' && firstItem !== null &&
+            'codigo' in firstItem && 'nome' in firstItem && 'uf' in firstItem) {
+          return data as MunicipioSugestao[];
+        }
+      }
+      return [];
+    } else if (res.status === 409) {
+      // Handle ambiguous municipality name
+      const errorData = await res.json();
+      if (errorData.detail && errorData.detail.includes('Nome de município ambíguo') && errorData.detail.includes('Possíveis códigos:')) {
+        const match = errorData.detail.match(/Possíveis códigos: \[([^\]]+)\]/);
+        if (match) {
+          const codigos = match[1].split(',').map((c: string) => c.trim());
+          // Criar sugestões baseadas nos códigos
+          const sugestoes: MunicipioSugestao[] = [];
+          for (const codigo of codigos) {
+            try {
+              const detailRes = await fetch(`${BASE_URL}/escolas/municipios/${codigo}`);
+              if (detailRes.ok) {
+                const detailData = await detailRes.json();
+                if (Array.isArray(detailData) && detailData.length > 0) {
+                  const escola = detailData[0];
+                  sugestoes.push({
+                    codigo: parseInt(codigo),
+                    nome: escola.nome_municipio || termo.trim(),
+                    uf: escola.sigla_uf || 'UF'
+                  });
+                }
+              }
+            } catch (error) {
+              console.error(`Erro ao buscar detalhes do município ${codigo}:`, error);
+            }
+          }
+          return sugestoes;
+        }
+      }
+      return [];
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error('Erro ao buscar sugestões:', error);
+    return [];
+  }
 }
 
 function computeBounds(points: HeatmapPoint[]): [[number, number], [number, number]] | null {
@@ -545,6 +607,8 @@ export default function Dashboard() {
   const [codigoMunicipio, setCodigoMunicipio] = useState<string>('3106200');
   const [codigoMunicipioInput, setCodigoMunicipioInput] = useState<string>('3106200');
   const [municipioDisplayName, setMunicipioDisplayName] = useState<string>('3106200');
+  const [municipioSugestoes, setMunicipioSugestoes] = useState<MunicipioSugestao[]>([]);
+  const [showSugestoes, setShowSugestoes] = useState<boolean>(false);
   const [ano, setAno] = useState<number>(2023);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [heatmapPoints, setHeatmapPoints] = useState<HeatmapPoint[]>([]);
@@ -612,6 +676,21 @@ export default function Dashboard() {
     loadData(activeThemeId, codigoMunicipio, ano);
   }, [activeThemeId, codigoMunicipio, ano, loadData]);
 
+  useEffect(() => {
+    const fetchSugestoes = async () => {
+      if (codigoMunicipioInput.trim().length >= 2) {
+        const sugestoes = await fetchMunicipioSugestoes(codigoMunicipioInput);
+        setMunicipioSugestoes(sugestoes);
+        setShowSugestoes(sugestoes.length > 0);
+      } else {
+        setMunicipioSugestoes([]);
+        setShowSugestoes(false);
+      }
+    };
+    const timeoutId = setTimeout(fetchSugestoes, 300); // Debounce
+    return () => clearTimeout(timeoutId);
+  }, [codigoMunicipioInput]);
+
   const handleThemeChange = (themeId: string) => {
     setActiveThemeId(themeId);
   };
@@ -622,7 +701,16 @@ export default function Dashboard() {
     if (trimmed && trimmed !== codigoMunicipio) {
       setCodigoMunicipio(trimmed);
       setMunicipioDisplayName(trimmed);
+      setShowSugestoes(false);
     }
+  };
+
+  const handleSugestaoSelect = (sugestao: MunicipioSugestao) => {
+    const codigoStr = sugestao.codigo.toString();
+    setCodigoMunicipio(codigoStr);
+    setMunicipioDisplayName(`${sugestao.nome} - ${sugestao.uf}`);
+    setCodigoMunicipioInput(`${sugestao.nome} - ${sugestao.uf}`);
+    setShowSugestoes(false);
   };
 
   return (
@@ -682,15 +770,43 @@ export default function Dashboard() {
                 Código ou Nome do Município
               </p>
               <div className="flex gap-2">
-                <input
-                  type="text"
-                  inputMode="text"
-                  className="filter-select flex-1"
-                  placeholder="Ex: 3106200 ou Belo Horizonte"
-                  value={codigoMunicipioInput}
-                  onChange={(event) => setCodigoMunicipioInput(event.target.value)}
-                />
-                <button type="submit" className="btn-header-outline px-3 py-2 text-xs">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    inputMode="text"
+                    className="filter-select w-full"
+                    placeholder="Ex: 3106200 ou Belo Horizonte"
+                    value={codigoMunicipioInput}
+                    onChange={(event) => setCodigoMunicipioInput(event.target.value)}
+                    onFocus={() => {
+                      // Sempre mostrar o dropdown quando focar, mesmo se vazio
+                      setShowSugestoes(true);
+                    }}
+                    onBlur={() => setTimeout(() => setShowSugestoes(false), 200)}
+                  />
+                  {showSugestoes && (
+                    <div className="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-1">
+                      {municipioSugestoes.length > 0 ? (
+                        municipioSugestoes.map((sugestao) => (
+                          <button
+                            key={sugestao.codigo}
+                            type="button"
+                            className="w-full text-left px-4 py-2 hover:bg-slate-50 border-b border-slate-100 last:border-b-0"
+                            onClick={() => handleSugestaoSelect(sugestao)}
+                          >
+                            <div className="font-medium text-slate-900">{sugestao.nome}</div>
+                            <div className="text-sm text-slate-500">{sugestao.uf} - Código: {sugestao.codigo}</div>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-4 py-2 text-sm text-slate-500">
+                          Digite pelo menos 2 caracteres...
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <button type="submit" className="btn-header-outline px-3 py-2 text-xs whitespace-nowrap">
                   Aplicar
                 </button>
               </div>
