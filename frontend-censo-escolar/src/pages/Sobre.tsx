@@ -102,7 +102,7 @@ export default function Sobre() {
                 </div>
             </div>
 
-            {/* Content: O Projeto */}
+           {/* Content: O Projeto */}
             {activeTab === 'projeto' && (
                 <div className="animate-in fade-in duration-500">
                     <div className="flex flex-col lg:flex-row gap-16">
@@ -112,7 +112,6 @@ export default function Sobre() {
                             {/* Adicionado space-y-4 para padronizar o espaçamento interno */}
                             <section className="space-y-4">
                                 <h2 className="section-title">O projeto</h2>
-                                {/* Adicionado text-justify e removido o mb-4 isolado */}
                                 <p className="section-paragraph text-justify">
                                     O DataEscola foi desenvolvido com a finalidade de organizar e apresentar dados sobre a infraestrutura educacional brasileira de forma mais intuitiva, visual e acessível. A proposta central é facilitar a interpretação de informações qualificadas, apoiando análises comparativas, investigações detalhadas e uma visão ampla do contexto nacional. Com isso, a plataforma busca reduzir a complexidade da leitura de bases educacionais e ampliar o acesso a informações relevantes para estudos, pesquisas e tomada de decisão.
                                 </p>
@@ -133,7 +132,6 @@ export default function Sobre() {
                             </section>
 
                             {/* Card DataViva Integrado */}
-                            {/* Adicionado space-y-4 para empurrar os elementos internamente de forma fluida */}
                             <section className="dataviva-card space-y-4">
                                 <div className="dataviva-card-stripe"></div>
                                 <h3 className="dataviva-card-title flex items-center gap-2">
@@ -143,7 +141,6 @@ export default function Sobre() {
                                 <p className="section-paragraph text-justify">
                                     O DataEscola é impulsionado pela expertise tecnológica do <strong>DataViva</strong>. Como plataforma parceira, o DataViva fornece a robustez em arquitetura de dados necessária para processar e visualizar o censo escolar de forma escalável e performática.
                                 </p>
-                                {/* Transformado em block para respeitar o space-y-4 adequadamente */}
                                 <div className="pt-2">
                                     <a href="https://dataviva.info/" target="_blank" rel="noopener noreferrer" className="dataviva-card-link inline-flex items-center gap-1">
                                         Conheça o DataViva <span aria-hidden="true">&rarr;</span>
@@ -152,18 +149,56 @@ export default function Sobre() {
                             </section>
                         </div>
 
-                        {/* Coluna Direita: Imagens e Tópicos */}
+                        {/* Coluna Direita: Ilustração e Tópicos */}
                         <div className="lg:w-[55%] space-y-10">
 
-                            {/* Mockup Placeholder - Censo Escolar */}
-                            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                                <div className="w-full aspect-4/3 bg-slate-100 flex items-center justify-center text-slate-400 font-mono text-sm border-b border-slate-200">
-                                    [ IMAGEM DO DASHBOARD / MOCKUP ]
-                                </div>
+                            {/* Ilustração SVG - Tamanho Expandido */}
+                            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-6 flex flex-col items-center w-full">
+                                <svg
+                                    className="w-full max-w-xl h-auto drop-shadow-sm"
+                                    viewBox="0 0 420 310"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    {/* Fundo do painel */}
+                                    <rect x="10" y="10" width="400" height="290" rx="12" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="2" />
+
+                                    {/* Linhas de Grade de Fundo */}
+                                    <line x1="50" y1="240" x2="370" y2="240" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="3 3" />
+                                    <line x1="50" y1="190" x2="370" y2="190" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="3 3" />
+                                    <line x1="50" y1="140" x2="370" y2="140" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="3 3" />
+                                    <line x1="50" y1="90" x2="370" y2="90" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="3 3" />
+                                    <line x1="50" y1="240" x2="50" y2="70" stroke="#cbd5e1" strokeWidth="1" />
+
+                                    {/* Ícone de Escola Estilizado */}
+                                    <path d="M110 240H210V160L160 120L110 160V240Z" fill="#94a3b8" />
+                                    <path d="M160 120L210 160H110L160 120Z" fill="#cbd5e1" />
+                                    <rect x="130" y="180" width="20" height="20" rx="2" fill="#f8fafc" />
+                                    <rect x="170" y="180" width="20" height="20" rx="2" fill="#f8fafc" />
+                                    <rect x="150" y="210" width="20" height="30" rx="2" fill="#cbd5e1" />
+
+                                    {/* Barras de Dados (Teal) */}
+                                    <rect x="250" y="160" width="25" height="80" rx="4" fill="#14b8a6" className="animate-pulse" />
+                                    <rect x="290" y="120" width="25" height="120" rx="4" fill="#14b8a6" fillOpacity="0.8" />
+                                    <rect x="330" y="200" width="25" height="40" rx="4" fill="#14b8a6" />
+
+                                    {/* Lupa (Análise) */}
+                                    <circle cx="160" cy="180" r="35" fill="#ffffff" fillOpacity="0.9" stroke="#0ea5e9" strokeWidth="4" />
+                                    <path d="M145 180H175M160 165V195" stroke="#0ea5e9" strokeWidth="3" strokeLinecap="round" />
+                                    <line x1="184" y1="204" x2="215" y2="235" stroke="#0ea5e9" strokeWidth="6" strokeLinecap="round" />
+
+                                    {/* Títulos e Legendas Decorativas */}
+                                    <rect x="50" y="260" width="60" height="10" rx="3" fill="#cbd5e1" />
+                                    <rect x="130" y="260" width="60" height="10" rx="3" fill="#cbd5e1" />
+                                    <rect x="210" y="260" width="60" height="10" rx="3" fill="#cbd5e1" />
+                                    <rect x="290" y="260" width="60" height="10" rx="3" fill="#cbd5e1" />
+                                    <rect x="50" y="40" width="100" height="15" rx="4" fill="#475569" />
+                                    <rect x="170" y="40" width="70" height="15" rx="4" fill="#14b8a6" fillOpacity="0.2" />
+
+                                </svg>
                             </div>
 
                             <div className="space-y-6">
-                                {/* Adicionado space-y-2 aos sub-tópicos para padronizar distância entre h4 e p */}
                                 <div className="space-y-2">
                                     <h4 className="feature-title">Visão geral da infraestrutura nacional</h4>
                                     <p className="section-paragraph text-justify">Nesta seção, o usuário tem acesso a uma leitura ampla do cenário educacional brasileiro, com indicadores gerais sobre infraestrutura escolar em nível nacional. Essa visão permite identificar padrões, tendências e aspectos relevantes relacionados às condições das escolas no país.</p>
