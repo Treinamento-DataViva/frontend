@@ -55,6 +55,7 @@ interface DashboardData {
   heatmapPoints: HeatmapPoint[];
   kpis: KpiData[];
   bounds: [[number, number], [number, number]] | null;
+  availableYears: number[];
 }
 
 interface IndicadoresApiResponse {
@@ -231,6 +232,14 @@ function buildHeatmapPointsFromEscolas(
   }, []);
 }
 
+function extractAvailableYears(escolas: EscolaGeoResponse[]): number[] {
+  const years = new Set<number>();
+  for (const escola of escolas) {
+    if (Number.isFinite(escola.ano)) years.add(escola.ano);
+  }
+  return Array.from(years).sort((a, b) => b - a);
+}
+
 function buildMunicipioInfo(codigoMunicipio: string, totalEscolas: number): MunicipioInfo {
   return {
     codigo: codigoMunicipio,
@@ -307,10 +316,12 @@ function buildKpis(themeId: string, data: IndicadoresApiResponse): KpiData[] {
  */
 async function fetchDashboardData(
   codigoMunicipio: string,
-  themeId: string
+  themeId: string,
+  ano: number
 ): Promise<DashboardData> {
+  const query = `?ano=${ano}`;
   const res = await fetch(
-    `${BASE_URL}/escolas/municipios/${codigoMunicipio}/indicadores`
+    `${BASE_URL}/escolas/municipios/${codigoMunicipio}/indicadores${query}`
   );
 
   if (!res.ok) {
@@ -319,8 +330,17 @@ async function fetchDashboardData(
 
   const indicadores: IndicadoresApiResponse = await res.json();
 
-  const geoRes = await fetch(
+  const geoYearsRes = await fetch(
     `${BASE_URL}/escolas/municipios/${codigoMunicipio}`
+  );
+  if (!geoYearsRes.ok) {
+    throw new Error(`Erro ao buscar anos disponíveis do município ${codigoMunicipio}`);
+  }
+  const escolasTodas: EscolaGeoResponse[] = await geoYearsRes.json();
+  const availableYears = extractAvailableYears(escolasTodas);
+
+  const geoRes = await fetch(
+    `${BASE_URL}/escolas/municipios/${codigoMunicipio}${query}`
   );
   if (!geoRes.ok) {
     throw new Error(`Erro ao buscar escolas do município ${codigoMunicipio}`);
@@ -331,7 +351,7 @@ async function fetchDashboardData(
   const bounds = computeBounds(heatmapPoints);
   const municipio = buildMunicipioInfo(codigoMunicipio, indicadores.total_escolas);
   const kpis = buildKpis(themeId, indicadores);
-  return { municipio, heatmapPoints, kpis, bounds };
+  return { municipio, heatmapPoints, kpis, bounds, availableYears };
 }
 
 // ============================================================
@@ -517,6 +537,8 @@ export default function Dashboard() {
   const [activeThemeId, setActiveThemeId] = useState<string>('infraestrutura');
   const [codigoMunicipio, setCodigoMunicipio] = useState<string>('3106200');
   const [codigoMunicipioInput, setCodigoMunicipioInput] = useState<string>('3106200');
+  const [ano, setAno] = useState<number>(2023);
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [heatmapPoints, setHeatmapPoints] = useState<HeatmapPoint[]>([]);
   const [kpis, setKpis] = useState<KpiData[]>([]);
   const [municipio, setMunicipio] = useState<MunicipioInfo | null>(null);
@@ -540,15 +562,19 @@ export default function Dashboard() {
     [activeTheme]
   );
 
-  const loadData = useCallback(async (themeId: string, municipioCodigo: string) => {
+  const loadData = useCallback(async (themeId: string, municipioCodigo: string, anoSelecionado: number) => {
     if (!municipioCodigo) return;
     setIsLoading(true);
     try {
-      const data = await fetchDashboardData(municipioCodigo, themeId);
+      const data = await fetchDashboardData(municipioCodigo, themeId, anoSelecionado);
       setMunicipio(data.municipio);
       setHeatmapPoints(data.heatmapPoints);
       setKpis(data.kpis);
       setMapBounds(data.bounds);
+      setAvailableYears(data.availableYears);
+      if (data.availableYears.length > 0 && !data.availableYears.includes(anoSelecionado)) {
+        setAno(data.availableYears[0]);
+      }
     } catch (err) {
       console.error('Erro ao carregar dados do dashboard:', err);
     } finally {
@@ -557,8 +583,8 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    loadData(activeThemeId, codigoMunicipio);
-  }, [activeThemeId, codigoMunicipio, loadData]);
+    loadData(activeThemeId, codigoMunicipio, ano);
+  }, [activeThemeId, codigoMunicipio, ano, loadData]);
 
   const handleThemeChange = (themeId: string) => {
     setActiveThemeId(themeId);
@@ -643,29 +669,25 @@ export default function Dashboard() {
               </div>
             </form>
 
-            {/* Zona */}
+            {/* Ano */}
             <div className="space-y-2">
-              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-bold">Zona</p>
-              <select className="filter-select" id="select-zona">
-                <option value="">Todas as zonas</option>
-                <option value="urbana">Urbana</option>
-                <option value="rural">Rural</option>
+              <p className="text-[11px] text-slate-500 uppercase tracking-wide font-bold">
+                Ano
+              </p>
+              <select
+                className="filter-select"
+                value={ano}
+                onChange={(event) => setAno(Number(event.target.value))}
+              >
+                {availableYears.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
               </select>
             </div>
-          </div>
 
-          {/* Botão Limpar */}
-          <div className="pt-2">
-            <button className="btn-clear w-full" id="btn-clear-filters">
-              <span className="flex items-center justify-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Limpar Filtros
-              </span>
-            </button>
           </div>
-
         </div>
       </aside>
 
