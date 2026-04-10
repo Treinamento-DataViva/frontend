@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import ReactECharts from "echarts-for-react";
 import { Download, Share2 } from "lucide-react";
 
-const BASE_URL = "/api";
+const BASE_URL = "http://localhost:8000";
 const ESTADOS = [
   { sigla: "AC", nome: "Acre" },
   { sigla: "AL", nome: "Alagoas" },
