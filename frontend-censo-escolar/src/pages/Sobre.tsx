@@ -3,11 +3,12 @@ import { useState } from 'react';
 // Importando as imagens diretamente da pasta assets
 import manAvatar from '../assets/man.png';
 import womanAvatar from '../assets/woman.png';
+import pauloAvatar from '../assets/paulo.jpeg';
 
 const teamMembers = [
     {
         name: 'Ana Clara',
-        role: 'Texto',
+        role: 'Desenvolvedor',
         avatar: womanAvatar,
         socials: {
             github: 'https://github.com/Anaarjo',
@@ -17,7 +18,7 @@ const teamMembers = [
     },
     {
         name: 'João Victor',
-        role: 'Texto',
+        role: 'Desenvolvedor',
         avatar: manAvatar,
         socials: {
             github: 'https://github.com/jvvls',
@@ -27,8 +28,8 @@ const teamMembers = [
     },
     {
         name: 'Paulo',
-        role: 'Texto',
-        avatar: manAvatar,
+        role: 'Desenvolvedor',
+        avatar: pauloAvatar,
         socials: {
             github: 'https://github.com/paulocarmonaa',
             linkedin: 'https://www.linkedin.com/in/paulohenriquecarmonaramos/',
@@ -37,7 +38,7 @@ const teamMembers = [
     },
     {
         name: 'Pedro',
-        role: 'Texto',
+        role: 'Desenvolvedor',
         avatar: manAvatar,
         socials: {
             github: 'https://github.com/PedroGCorrea',
