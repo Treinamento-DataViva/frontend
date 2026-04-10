@@ -1,23 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef, type FormEvent } from 'react';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
-import L from 'leaflet';
+import { CircleMarker, MapContainer, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet.heat';
-
-// Extend Leaflet types for leaflet.heat
-declare module 'leaflet' {
-  function heatLayer(
-    latlngs: Array<[number, number, number?]>,
-    options?: {
-      minOpacity?: number;
-      maxZoom?: number;
-      max?: number;
-      radius?: number;
-      blur?: number;
-      gradient?: Record<number, string>;
-    }
-  ): L.Layer;
-}
 
 // ============================================================
 // Tipos & Interfaces
@@ -108,7 +91,7 @@ interface EscolaGeoResponse {
 }
 
 // ============================================================
-// Temas disponíveis para o Heatmap
+// Temas disponíveis para o mapa
 // ============================================================
 
 const heatmapThemes: HeatmapTheme[] = [
@@ -145,6 +128,20 @@ const heatmapThemes: HeatmapTheme[] = [
     unit: '%',
   },
 ];
+
+// ============================================================
+// Funções auxiliares do Mapa de Pontos
+// ============================================================
+
+function getThemePointPalette(theme: HeatmapTheme) {
+  const gradientStops = Object.entries(theme.gradient)
+    .sort(([a], [b]) => Number(a) - Number(b))
+    .map(([, color]) => color);
+  return {
+    highlight: gradientStops[Math.max(gradientStops.length - 3, 0)] ?? '#0ea5e9',
+    neutral: '#94a3b8',
+  };
+}
 
 // ============================================================
 // Configuração de API
@@ -264,7 +261,6 @@ async function fetchMunicipioSugestoes(termo: string): Promise<MunicipioSugestao
     const res = await fetch(`${BASE_URL}/escolas/municipios/${encodedTermo}`);
     if (res.ok) {
       const data = await res.json();
-      // Verifica se é uma lista de sugestões (array com objetos que têm codigo, nome, uf)
       if (Array.isArray(data) && data.length > 0) {
         const firstItem = data[0];
         if (typeof firstItem === 'object' && firstItem !== null &&
@@ -274,13 +270,11 @@ async function fetchMunicipioSugestoes(termo: string): Promise<MunicipioSugestao
       }
       return [];
     } else if (res.status === 409) {
-      // Handle ambiguous municipality name
       const errorData = await res.json();
       if (errorData.detail && errorData.detail.includes('Nome de município ambíguo') && errorData.detail.includes('Possíveis códigos:')) {
         const match = errorData.detail.match(/Possíveis códigos: \[([^\]]+)\]/);
         if (match) {
           const codigos = match[1].split(',').map((c: string) => c.trim());
-          // Criar sugestões baseadas nos códigos
           const sugestoes: MunicipioSugestao[] = [];
           for (const codigo of codigos) {
             try {
@@ -377,9 +371,6 @@ function buildKpis(themeId: string, data: IndicadoresApiResponse): KpiData[] {
   return kpisByTheme[themeId] || kpisByTheme['infraestrutura'];
 }
 
-/**
- * Busca os dados do dashboard para um município e tema específicos.
- */
 async function fetchDashboardData(
   municipioTerm: string,
   themeId: string,
@@ -423,53 +414,37 @@ async function fetchDashboardData(
   return { municipio, heatmapPoints, kpis, bounds, availableYears, selectedYear };
 }
 
-// Componente HeatmapLayer (inline, usa leaflet.heat)
+// Componente PointLayer (inline, renderiza um ponto por escola)
 // ============================================================
 
-interface HeatmapLayerProps {
+interface PointLayerProps {
   points: HeatmapPoint[];
-  options?: {
-    minOpacity?: number;
-    maxZoom?: number;
-    max?: number;
-    radius?: number;
-    blur?: number;
-    gradient?: Record<number, string>;
-  };
+  theme: HeatmapTheme;
 }
 
-function HeatmapLayer({ points, options = {} }: HeatmapLayerProps) {
-  const map = useMap();
-  const heatLayerRef = useRef<L.Layer | null>(null);
+function PointLayer({ points, theme }: PointLayerProps) {
+  const palette = getThemePointPalette(theme);
 
-  useEffect(() => {
-    if (heatLayerRef.current) {
-      map.removeLayer(heatLayerRef.current);
-    }
-
-    const heatData: [number, number, number][] = points.map((p) => [p.lat, p.lng, p.intensity]);
-
-    const defaultOptions = {
-      radius: 25,
-      blur: 15,
-      maxZoom: 17,
-      max: 1.0,
-      minOpacity: 0.4,
-      ...options,
-    };
-
-    const layer = L.heatLayer(heatData, defaultOptions);
-    layer.addTo(map);
-    heatLayerRef.current = layer;
-
-    return () => {
-      if (heatLayerRef.current) {
-        map.removeLayer(heatLayerRef.current);
-      }
-    };
-  }, [map, points, options]);
-
-  return null;
+  return (
+    <>
+      {points.map((point, index) => {
+        const matchesTheme = point.intensity >= 1;
+        return (
+          <CircleMarker
+            key={`${point.lat}-${point.lng}-${index}`}
+            center={[point.lat, point.lng]}
+            radius={matchesTheme ? 6 : 4}
+            pathOptions={{
+              color: '#ffffff',
+              weight: 1,
+              fillColor: matchesTheme ? palette.highlight : palette.neutral,
+              fillOpacity: matchesTheme ? 0.9 : 0.55,
+            }}
+          />
+        );
+      })}
+    </>
+  );
 }
 
 function FitBounds({ bounds }: { bounds: [[number, number], [number, number]] }) {
@@ -532,7 +507,6 @@ function KpiCard({ kpi }: { kpi: KpiData }) {
 
   return (
     <div className="kpi-card group">
-      {/* Margem inferior padronizada no layout do card */}
       <div className="flex justify-between items-start mb-2">
         <div className="kpi-label">{kpi.label}</div>
         <span className={`text-xs font-bold ${changeColor}`}>{kpi.change}</span>
@@ -542,26 +516,29 @@ function KpiCard({ kpi }: { kpi: KpiData }) {
   );
 }
 
-function GradientLegend({ theme }: { theme: HeatmapTheme }) {
-  const gradientStops = Object.entries(theme.gradient)
-    .sort(([a], [b]) => Number(a) - Number(b))
-    .map(([, color]) => color);
-
-  const gradientCSS = `linear-gradient(to right, ${gradientStops.join(', ')})`;
+function PointLegend({ theme }: { theme: HeatmapTheme }) {
+  const palette = getThemePointPalette(theme);
 
   return (
-    <div className="gradient-legend space-y-1.5">
+    <div className="gradient-legend space-y-2">
       <div className="flex justify-between items-center">
-        <span className="text-xs font-bold text-slate-600">Intensidade — {theme.label}</span>
+        <span className="text-xs font-bold text-slate-600">Leitura do mapa — {theme.label}</span>
       </div>
-      <div
-        className="h-3 rounded-full shadow-inner"
-        style={{ background: gradientCSS }}
-      />
-      <div className="flex justify-between">
-        <span className="text-[10px] text-slate-400 font-medium">Baixo</span>
-        <span className="text-[10px] text-slate-400 font-medium">Médio</span>
-        <span className="text-[10px] text-slate-400 font-medium">Alto</span>
+      <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-500 font-medium">
+        <div className="flex items-center gap-2">
+          <span
+            className="inline-block w-3 h-3 rounded-full border border-white shadow-sm"
+            style={{ backgroundColor: palette.highlight }}
+          />
+          Atende ao critério
+        </div>
+        <div className="flex items-center gap-2">
+          <span
+            className="inline-block w-3 h-3 rounded-full border border-white shadow-sm"
+            style={{ backgroundColor: palette.neutral }}
+          />
+          Demais escolas
+        </div>
       </div>
     </div>
   );
@@ -620,18 +597,6 @@ export default function Dashboard() {
   const activeTheme = useMemo(
     () => heatmapThemes.find((t) => t.id === activeThemeId) || heatmapThemes[0],
     [activeThemeId]
-  );
-
-  const heatmapOptions = useMemo(
-    () => ({
-      radius: 25,
-      blur: 18,
-      maxZoom: 17,
-      max: 1.0,
-      minOpacity: 0.45,
-      gradient: activeTheme.gradient,
-    }),
-    [activeTheme]
   );
 
   const loadData = useCallback(async (themeId: string, municipioCodigo: string, anoSelecionado: number) => {
@@ -728,8 +693,8 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div>
-                <h2 className="text-sm font-bold text-white tracking-tight">Heatmap</h2>
-                <p className="text-[11px] text-slate-500">Visualização Espacial</p>
+                <h2 className="text-sm font-bold text-white tracking-tight">Mapa</h2>
+                <p className="text-[11px] text-slate-500">Visualização por pontos</p>
               </div>
             </div>
           </div>
@@ -778,7 +743,6 @@ export default function Dashboard() {
                     value={codigoMunicipioInput}
                     onChange={(event) => setCodigoMunicipioInput(event.target.value)}
                     onFocus={() => {
-                      // Sempre mostrar o dropdown quando focar, mesmo se vazio
                       setShowSugestoes(true);
                     }}
                     onBlur={() => setTimeout(() => setShowSugestoes(false), 200)}
@@ -835,7 +799,6 @@ export default function Dashboard() {
 
       {/* ================= MAIN CONTENT ================= */}
       <main className="dashboard-main">
-        {/* Usando space-y-6 para o espaçamento principal */}
         <div className="dashboard-content space-y-6">
 
           {/* Header do Município */}
@@ -853,11 +816,11 @@ export default function Dashboard() {
               : kpis.map((kpi, i) => <KpiCard key={i} kpi={kpi} />)}
           </div>
 
-          {/* Mapa com Heatmap */}
+          {/* Mapa com pontos */}
           <div className="map-card">
             <div className="map-header">
               <div className="flex items-center gap-3">
-                <h3 className="font-bold text-slate-800">Mapa de Calor</h3>
+                <h3 className="font-bold text-slate-800">Mapa de Pontos</h3>
                 {isLoading && (
                   <div className="flex items-center gap-2 text-xs text-teal-600 font-medium">
                     <div className="w-3 h-3 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
@@ -865,7 +828,7 @@ export default function Dashboard() {
                   </div>
                 )}
               </div>
-              <GradientLegend theme={activeTheme} />
+              <PointLegend theme={activeTheme} />
             </div>
             <div className="map-wrapper">
               {municipio && mapBounds && heatmapPoints.length > 0 && (
@@ -875,6 +838,7 @@ export default function Dashboard() {
                     (mapBounds[0][1] + mapBounds[1][1]) / 2,
                   ]}
                   zoom={12}
+                  preferCanvas={true}
                   className="w-full h-full"
                   key={`map-${municipio.codigo}`}
                 >
@@ -886,10 +850,7 @@ export default function Dashboard() {
                   {!isLoading && (
                     <>
                       <FitBounds bounds={mapBounds} />
-                      <HeatmapLayer
-                        points={heatmapPoints}
-                        options={heatmapOptions}
-                      />
+                      <PointLayer points={heatmapPoints} theme={activeTheme} />
                     </>
                   )}
                 </MapContainer>
